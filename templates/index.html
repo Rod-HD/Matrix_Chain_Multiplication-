@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matrix Chain Multiplication — Demo</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Matrix Chain Multiplication</h1>
+  <p>Quy hoạch động Bottom-Up theo CLRS 15.2 — Môn Phân tích và Thiết kế Thuật toán (UIT)</p>
+</header>
+
+<div class="app-body">
+  <!-- INPUT PANEL -->
+  <section class="input-panel">
+    <div class="card">
+      <div class="card-header">📐 Nhập Dimension Array</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label>Dimension Array p (cách nhau bằng dấu phẩy hoặc khoảng trắng)</label>
+          <input type="text" id="dimsInput" placeholder="VD: 30 35 15 5 10 20 25" value="30 35 15 5 10 20 25">
+          <small class="hint">Ma trận A<sub>i</sub> có kích thước p[i-1] × p[i]. Cần ít nhất 2 phần tử.</small>
+        </div>
+
+        <div class="examples">
+          <label>Ví dụ mẫu:</label>
+          <div class="example-btns">
+            <button class="btn btn-secondary" onclick="loadExample('30 35 15 5 10 20 25')">CLRS (6 ma trận)</button>
+            <button class="btn btn-secondary" onclick="loadExample('3 10 7 2')">Slide (3 ma trận)</button>
+            <button class="btn btn-secondary" onclick="loadExample('10 20 50 1 100')">4 ma trận</button>
+            <button class="btn btn-secondary" onclick="loadExample('5 7')">1 ma trận</button>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" id="solveBtn" onclick="submitSolve()">
+            <span id="solveLbl">▶ GIẢI</span>
+            <div class="spinner" id="solveSpin" style="display:none"></div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULA CARD -->
+    <div class="card" style="margin-top:1rem">
+      <div class="card-header">📖 Công thức truy hồi</div>
+      <div class="card-body formula-card">
+        <div class="formula">
+          m[i, j] = 0 &nbsp;&nbsp; nếu i = j<br>
+          m[i, j] = min<sub>i≤k&lt;j</sub> { m[i,k] + m[k+1,j] + p<sub>i-1</sub>·p<sub>k</sub>·p<sub>j</sub> }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT PANEL -->
+  <section class="result-panel" id="resultPanel" style="display:none">
+    <!-- SUMMARY -->
+    <div class="card" id="summaryCard">
+      <div class="card-header">✅ Kết quả</div>
+      <div class="card-body">
+        <div class="result-summary" id="resultSummary"></div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="card" style="margin-top:1rem">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="tables" onclick="switchTab('tables')">📊 Bảng m & s</button>
+        <button class="tab-btn" data-tab="steps" onclick="switchTab('steps')">📋 Các bước</button>
+        <button class="tab-btn" data-tab="tree" onclick="switchTab('tree')">🌳 Cây đóng ngoặc</button>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="tab-tables"></div>
+        <div class="tab-pane" id="tab-steps"></div>
+        <div class="tab-pane" id="tab-tree"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>Matrix Chain Multiplication | Python + Flask | CLRS 15.2</footer>
+
+<!-- ERROR TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════ */
+let lastResult = null;
+let currentStep = 0;
+
+/* ═══════════════════════════════════════════════════════
+   EXAMPLES
+═══════════════════════════════════════════════════════ */
+function loadExample(val) {
+  document.getElementById('dimsInput').value = val;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SOLVE
+═══════════════════════════════════════════════════════ */
+async function submitSolve() {
+  const raw = document.getElementById('dimsInput').value.trim();
+  if (!raw) { showToast('Hãy nhập Dimension Array.', 'error'); return; }
+
+  // Parse input
+  const dims = raw.split(/[\s,;]+/).map(Number);
+  if (dims.some(isNaN)) { showToast('Dimension Array chứa giá trị không hợp lệ.', 'error'); return; }
+
+  document.getElementById('solveLbl').textContent = 'Đang giải...';
+  document.getElementById('solveSpin').style.display = 'block';
+  document.getElementById('solveBtn').disabled = true;
+
+  try {
+    const resp = await fetch('/api/solve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dims })
+    });
+    const data = await resp.json();
+    if (data.error) { showToast('Lỗi: ' + data.error, 'error'); return; }
+    lastResult = data;
+    renderResult(data);
+  } catch (e) {
+    showToast('Lỗi kết nối: ' + e.message, 'error');
+  } finally {
+    document.getElementById('solveLbl').textContent = '▶ GIẢI';
+    document.getElementById('solveSpin').style.display = 'none';
+    document.getElementById('solveBtn').disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER RESULT
+═══════════════════════════════════════════════════════ */
+function renderResult(data) {
+  const panel = document.getElementById('resultPanel');
+  panel.style.display = 'block';
+
+  // Summary
+  const summary = document.getElementById('resultSummary');
+  summary.innerHTML = `
+    <div class="result-card highlight">
+      <div class="rc-label">Chi phí tối thiểu</div>
+      <div class="rc-value">${data.cost.toLocaleString()}</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">Số ma trận (n)</div>
+      <div class="rc-value">${data.n}</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">Đóng ngoặc tối ưu</div>
+      <div class="rc-value parens-val">${escHtml(data.parens)}</div>
+    </div>
+  `;
+
+  renderTables(data);
+  renderSteps(data);
+  renderTree(data);
+  switchTab('tables');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER TABLES
+═══════════════════════════════════════════════════════ */
+function renderTables(data) {
+  const pane = document.getElementById('tab-tables');
+  const n = data.n;
+
+  let html = '<h3>Bảng m (chi phí tối thiểu)</h3>';
+  html += buildTableHtml(data.m_table, n, 'm');
+  html += '<h3 style="margin-top:1.5rem">Bảng s (vị trí tách tối ưu)</h3>';
+  html += buildTableHtml(data.s_table, n, 's');
+  pane.innerHTML = html;
+}
+
+function buildTableHtml(table, n, kind) {
+  let html = '<div class="table-wrapper"><table class="mcm-table">';
+  // Header row
+  html += '<thead><tr><th></th>';
+  for (let j = 1; j <= n; j++) html += `<th>j=${j}</th>`;
+  html += '</tr></thead><tbody>';
+  // Data rows
+  for (let i = 0; i < n; i++) {
+    html += `<tr><th>i=${i + 1}</th>`;
+    for (let j = 0; j < n; j++) {
+      const val = table[i][j];
+      const isUnused = val === null;
+      const isOptimal = (kind === 'm' && i === 0 && j === n - 1);
+      let cls = isUnused ? 'unused' : '';
+      if (isOptimal) cls += ' optimal';
+      html += `<td class="${cls}" data-i="${i+1}" data-j="${j+1}">${isUnused ? '-' : val}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  return html;
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER STEPS
+═══════════════════════════════════════════════════════ */
+function renderSteps(data) {
+  const pane = document.getElementById('tab-steps');
+  const steps = data.steps || [];
+
+  let html = '<div class="steps-controls">';
+  html += `<button class="btn btn-secondary" onclick="prevStep()">◀ Trước</button>`;
+  html += `<span class="step-counter" id="stepCounter">Bước 1 / ${steps.length}</span>`;
+  html += `<button class="btn btn-secondary" onclick="nextStep()">Sau ▶</button>`;
+  html += `<button class="btn btn-primary" onclick="playSteps()">▶ Tự động</button>`;
+  html += '</div>';
+
+  html += '<div id="stepDetail" class="step-detail"></div>';
+  html += '<div class="steps-list" id="stepsList">';
+  steps.forEach((step, idx) => {
+    html += `<div class="accordion-item${idx === 0 ? ' open' : ''}" id="step-${idx}">`;
+    html += `<div class="accordion-header" onclick="toggleStep(${idx})">`;
+    html += `<span><span class="step-badge">${idx + 1}</span>${escHtml(step.title)}</span>`;
+    html += `<i class="chevron">▾</i></div>`;
+    html += `<div class="accordion-body">`;
+    html += `<p class="step-desc">${escHtml(step.description)}</p>`;
+    if (step.candidates) {
+      html += '<div class="candidates">';
+      step.candidates.forEach(c => {
+        const isBest = c.k === step.best_k;
+        html += `<div class="candidate${isBest ? ' best' : ''}">`;
+        html += `<span class="cand-k">k = ${c.k}</span>`;
+        html += `<span class="cand-formula">${escHtml(c.formula)}</span>`;
+        if (isBest) html += `<span class="cand-badge">✓ Tối ưu</span>`;
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    if (step.best_cost !== undefined) {
+      html += `<div class="step-result">→ m[${step.i}][${step.j}] = <strong>${step.best_cost}</strong>, s[${step.i}][${step.j}] = <strong>${step.best_k}</strong></div>`;
+    }
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  pane.innerHTML = html;
+  currentStep = 0;
+  updateStepHighlight();
+}
+
+function toggleStep(idx) {
+  const el = document.getElementById('step-' + idx);
+  el.classList.toggle('open');
+}
+
+function prevStep() {
+  if (!lastResult) return;
+  currentStep = Math.max(0, currentStep - 1);
+  updateStepHighlight();
+}
+
+function nextStep() {
+  if (!lastResult) return;
+  currentStep = Math.min((lastResult.steps || []).length - 1, currentStep + 1);
+  updateStepHighlight();
+}
+
+let playInterval = null;
+function playSteps() {
+  if (playInterval) { clearInterval(playInterval); playInterval = null; return; }
+  if (!lastResult) return;
+  const total = (lastResult.steps || []).length;
+  currentStep = 0;
+  updateStepHighlight();
+  playInterval = setInterval(() => {
+    currentStep++;
+    if (currentStep >= total) { clearInterval(playInterval); playInterval = null; return; }
+    updateStepHighlight();
+  }, 1200);
+}
+
+function updateStepHighlight() {
+  if (!lastResult) return;
+  const steps = lastResult.steps || [];
+  const counter = document.getElementById('stepCounter');
+  if (counter) counter.textContent = `Bước ${currentStep + 1} / ${steps.length}`;
+
+  // Highlight current step in accordion
+  document.querySelectorAll('.accordion-item').forEach((el, idx) => {
+    el.classList.toggle('open', idx === currentStep);
+    el.classList.toggle('current', idx === currentStep);
+  });
+
+  // Scroll to current step
+  const el = document.getElementById('step-' + currentStep);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // Highlight cells in table
+  document.querySelectorAll('.mcm-table td.highlight').forEach(td => td.classList.remove('highlight'));
+  const step = steps[currentStep];
+  if (step && step.cells_updated) {
+    step.cells_updated.forEach(cell => {
+      const td = document.querySelector(`.mcm-table td[data-i="${cell.i}"][data-j="${cell.j}"]`);
+      if (td) td.classList.add('highlight');
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER TREE (Parenthesization visualization)
+═══════════════════════════════════════════════════════ */
+function renderTree(data) {
+  const pane = document.getElementById('tab-tree');
+  const n = data.n;
+  const s = data.s_table;
+
+  let html = '<div class="tree-section">';
+  html += '<h3>Cây phân tách (Parenthesization Tree)</h3>';
+  html += '<div class="tree-container" id="treeContainer">';
+  html += buildTreeHtml(s, 1, n, n);
+  html += '</div>';
+
+  // Textual trace
+  html += '<div class="trace-section">';
+  html += '<h4>Truy vết bảng s:</h4>';
+  html += '<div class="trace-text">';
+  html += buildTraceText(s, data.p, 1, n, n, 0);
+  html += '</div></div>';
+
+  html += '</div>';
+  pane.innerHTML = html;
+}
+
+function buildTreeHtml(s, i, j, n) {
+  if (i === j) {
+    return `<div class="tree-node leaf"><span class="node-label">A<sub>${i}</sub></span></div>`;
+  }
+  // s_table is 0-indexed in our display (row i-1, col j-1)
+  const k = s[i - 1][j - 1];
+  let html = `<div class="tree-node">`;
+  html += `<span class="node-label split">k=${k}<br><small>A<sub>${i}</sub>..A<sub>${j}</sub></small></span>`;
+  html += `<div class="tree-children">`;
+  html += buildTreeHtml(s, i, k, n);
+  html += buildTreeHtml(s, k + 1, j, n);
+  html += '</div></div>';
+  return html;
+}
+
+function buildTraceText(s, p, i, j, n, depth) {
+  const indent = '&nbsp;'.repeat(depth * 4);
+  if (i === j) {
+    return `${indent}A<sub>${i}</sub> (${p[i-1]}×${p[i]})<br>`;
+  }
+  const k = s[i - 1][j - 1];
+  let text = `${indent}split(${i},${j}) tại k=${k}:<br>`;
+  text += `${indent}&nbsp;&nbsp;Trái: A<sub>${i}</sub>..A<sub>${k}</sub><br>`;
+  text += buildTraceText(s, p, i, k, n, depth + 1);
+  text += `${indent}&nbsp;&nbsp;Phải: A<sub>${k+1}</sub>..A<sub>${j}</sub><br>`;
+  text += buildTraceText(s, p, k + 1, j, n, depth + 1);
+  return text;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════════ */
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab-pane').forEach(p =>
+    p.classList.toggle('active', p.id === 'tab-' + name));
+}
+
+/* ═══════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════ */
+function escHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════════════════════
+   KEYBOARD SHORTCUT
+═══════════════════════════════════════════════════════ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    const active = document.activeElement;
+    if (active && active.id === 'dimsInput') {
+      e.preventDefault();
+      submitSolve();
+    }
+  }
+});
+</script>
+</body>
+</html>

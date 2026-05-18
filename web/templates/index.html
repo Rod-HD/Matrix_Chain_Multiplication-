@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhân Chuỗi Ma Trận — Matrix Chain Multiplication</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Nhân Chuỗi Ma Trận</h1>
+            <p>Quy hoạch động Bottom-Up — CLRS 15.2</p>
+        </header>
+
+        <!-- Input Card -->
+        <div class="card">
+            <div class="card-title">Nhập dữ liệu</div>
+            <div class="input-group">
+                <input type="text" id="dims-input"
+                       placeholder="Nhập mảng chiều p (cách nhau bởi dấu cách)..."
+                       autocomplete="off">
+                <button class="btn btn-secondary" onclick="loadExample()">Ví dụ</button>
+                <button class="btn btn-primary" id="solve-btn" onclick="solve()">Giải</button>
+            </div>
+            <div class="input-hint">
+                Nhập n+1 số nguyên dương cách nhau bởi dấu cách. Ma trận A<sub>i</sub> có kích thước p[i−1] × p[i].
+            </div>
+            <div class="alert-error" id="error-box"></div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section">
+            <!-- Summary Card -->
+            <div class="card">
+                <div class="card-title">Kết quả</div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="label">Số ma trận (n)</div>
+                        <div class="value" id="res-n">—</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">Chi phí tối ưu</div>
+                        <div class="value" id="res-cost">—</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="label">Cách đặt ngoặc tối ưu</div>
+                        <div class="value parens" id="res-parens">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Card -->
+            <div class="card">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="tab-m">Bảng m</button>
+                    <button class="tab-btn" data-tab="tab-s">Bảng s</button>
+                    <button class="tab-btn" data-tab="tab-steps">Các bước</button>
+                    <button class="tab-btn" data-tab="tab-trace">Truy vết</button>
+                </div>
+
+                <!-- Tab: Bảng m -->
+                <div class="tab-content active" id="tab-m">
+                    <div class="table-wrapper" id="m-table-wrapper"></div>
+                </div>
+
+                <!-- Tab: Bảng s -->
+                <div class="tab-content" id="tab-s">
+                    <div class="table-wrapper" id="s-table-wrapper"></div>
+                </div>
+
+                <!-- Tab: Các bước -->
+                <div class="tab-content" id="tab-steps">
+                    <div id="steps-wrapper"></div>
+                </div>
+
+                <!-- Tab: Truy vết -->
+                <div class="tab-content" id="tab-trace">
+                    <div class="trace-tree" id="trace-wrapper"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // --- Tab switching ---
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
+    });
+
+    // --- Load example ---
+    function loadExample() {
+        document.getElementById('dims-input').value = '30 35 15 5 10 20 25';
+        hideError();
+    }
+
+    // --- Show/hide error ---
+    function showError(msg) {
+        const box = document.getElementById('error-box');
+        box.textContent = msg;
+        box.classList.add('show');
+    }
+
+    function hideError() {
+        document.getElementById('error-box').classList.remove('show');
+    }
+
+    // --- Solve ---
+    async function solve() {
+        hideError();
+        const input = document.getElementById('dims-input').value.trim();
+        if (!input) {
+            showError('Vui lòng nhập mảng chiều p.');
+            return;
+        }
+
+        // Parse input
+        const parts = input.split(/[\s,]+/);
+        const dims = [];
+        for (const part of parts) {
+            const num = parseInt(part, 10);
+            if (isNaN(num)) {
+                showError(`Giá trị không hợp lệ: "${part}". Vui lòng nhập số nguyên.`);
+                return;
+            }
+            dims.push(num);
+        }
+
+        // Call API
+        const btn = document.getElementById('solve-btn');
+        btn.disabled = true;
+        btn.classList.add('loading');
+
+        try {
+            const resp = await fetch('/api/solve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dims })
+            });
+
+            const data = await resp.json();
+
+            if (!resp.ok) {
+                showError(data.error || 'Đã xảy ra lỗi.');
+                document.getElementById('result-section').classList.remove('show');
+                return;
+            }
+
+            renderResult(data);
+        } catch (err) {
+            showError('Lỗi kết nối: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        }
+    }
+
+    // --- Render result ---
+    function renderResult(data) {
+        document.getElementById('result-section').classList.add('show');
+
+        // Summary
+        document.getElementById('res-n').textContent = data.n;
+        document.getElementById('res-cost').textContent = data.cost.toLocaleString('vi-VN');
+        document.getElementById('res-parens').textContent = data.parens;
+
+        // Tables
+        renderMTable(data.m_table, data.n);
+        renderSTable(data.s_table, data.n);
+
+        // Steps
+        renderSteps(data.steps);
+
+        // Trace
+        renderTrace(data.trace);
+    }
+
+    // --- Render m table ---
+    function renderMTable(m, n) {
+        let html = '<table class="dp-table"><thead><tr><th>m[i][j]</th>';
+        for (let j = 1; j <= n; j++) html += `<th>j=${j}</th>`;
+        html += '</tr></thead><tbody>';
+
+        for (let i = 0; i < n; i++) {
+            html += `<tr><td class="row-header">i=${i + 1}</td>`;
+            for (let j = 0; j < n; j++) {
+                const ri = i + 1, rj = j + 1;
+                if (ri > rj) {
+                    html += '<td class="unused">—</td>';
+                } else if (ri === rj) {
+                    html += '<td class="diagonal">0</td>';
+                } else {
+                    html += `<td class="computed">${m[i][j].toLocaleString('vi-VN')}</td>`;
+                }
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        document.getElementById('m-table-wrapper').innerHTML = html;
+    }
+
+    // --- Render s table ---
+    function renderSTable(s, n) {
+        let html = '<table class="dp-table"><thead><tr><th>s[i][j]</th>';
+        for (let j = 1; j <= n; j++) html += `<th>j=${j}</th>`;
+        html += '</tr></thead><tbody>';
+
+        for (let i = 0; i < n; i++) {
+            html += `<tr><td class="row-header">i=${i + 1}</td>`;
+            for (let j = 0; j < n; j++) {
+                const ri = i + 1, rj = j + 1;
+                if (ri >= rj) {
+                    html += '<td class="unused">—</td>';
+                } else {
+                    html += `<td class="computed">${s[i][j]}</td>`;
+                }
+            }
+            html += '</tr>';
+        }
+        html += '</tbody></table>';
+        document.getElementById('s-table-wrapper').innerHTML = html;
+    }
+
+    // --- Render steps ---
+    function renderSteps(steps) {
+        let html = '';
+        steps.forEach((step, idx) => {
+            const isOpen = idx === 0 ? ' open' : '';
+            html += `<div class="accordion-item${isOpen}">`;
+            html += `<div class="accordion-header" onclick="toggleAccordion(this)">`;
+            html += `<span class="arrow">▶</span>`;
+            html += `<span>Bước l=${step.length}: Chuỗi ${step.length} ma trận</span>`;
+            html += `</div>`;
+            html += `<div class="accordion-body">`;
+            step.cells.forEach(cell => {
+                html += `<span class="step-cell">m[${cell.i}][${cell.j}] = ${cell.cost.toLocaleString('vi-VN')} (k=${cell.k})</span>`;
+            });
+            html += `</div></div>`;
+        });
+        document.getElementById('steps-wrapper').innerHTML = html;
+    }
+
+    // --- Toggle accordion ---
+    function toggleAccordion(header) {
+        const item = header.parentElement;
+        item.classList.toggle('open');
+    }
+
+    // --- Render trace ---
+    function renderTrace(trace) {
+        let html = '';
+        trace.forEach(line => {
+            const indent = '│   '.repeat(line.depth);
+            const prefix = line.depth > 0 ? '├── ' : '';
+            const isMatrix = line.text.startsWith('A') && !line.text.startsWith('A') === false;
+            const cls = line.text.match(/^A\d+ \(/) ? 'matrix-info' : 'split-info';
+            html += `<div class="trace-line">`;
+            html += `<span class="indent">${indent}${prefix}</span>`;
+            html += `<span class="${cls}">${escapeHtml(line.text)}</span>`;
+            html += `</div>`;
+        });
+        document.getElementById('trace-wrapper').innerHTML = html;
+    }
+
+    // --- Utility ---
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // --- Enter key support ---
+    document.getElementById('dims-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') solve();
+    });
+    </script>
+</body>
+</html>

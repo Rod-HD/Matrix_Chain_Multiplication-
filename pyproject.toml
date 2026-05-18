@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcm"
+version = "0.1.0"
+description = "Matrix Chain Multiplication (MCM) — quy hoạch động Bottom-Up theo CLRS 15.2."
+requires-python = ">=3.10"
+# Không có runtime dependency (chỉ dùng thư viện chuẩn — Req 8.3).
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

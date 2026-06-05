@@ -127,10 +127,26 @@ function loadDims(p) {
   renderBuilder();
 }
 
-// Dựng mảng kích thước p từ danh sách ma trận.
+// Dựng mảng kích thước p từ danh sách ma trận — đọc giá trị thô từ ô nhập.
 function buildP() {
-  const p = [matrices[0].rows];
-  for (const m of matrices) p.push(m.cols);
+  const list = $("matrix-list");
+  const inputs = list.querySelectorAll("input.dim");
+  if (inputs.length === 0) {
+    // Fallback: dùng dữ liệu trong matrices[]
+    const p = [matrices[0].rows];
+    for (const m of matrices) p.push(m.cols);
+    return p;
+  }
+  // Đọc từng ô nhập theo thứ tự: rows A1, cols A1, cols A2, ...
+  // Mỗi hàng có 2 input: [rows, cols]. Lấy rows của A1 và cols của tất cả.
+  const rows = list.querySelectorAll("input.dim[data-role='rows']");
+  const cols = list.querySelectorAll("input.dim[data-role='cols']");
+  const p0 = Number(rows[0].value);
+  const p = [Number.isFinite(p0) ? p0 : rows[0].value];
+  for (const inp of cols) {
+    const v = Number(inp.value);
+    p.push(Number.isFinite(v) ? v : inp.value);
+  }
   return p;
 }
 
@@ -162,11 +178,11 @@ function renderBuilder() {
     const rowsLocked = i > 0;
     row.innerHTML = `
       <span class="mname">A${i + 1}</span>
-      <input class="dim ${rowsLocked ? "linked" : ""}" type="number" min="1"
+      <input class="dim ${rowsLocked ? "linked" : ""}" type="number"
              value="${m.rows}" data-role="rows" data-idx="${i}"
              ${rowsLocked ? "readonly title='Tự nối với số cột của A" + i + "'" : ""}>
       <span class="times">&times;</span>
-      <input class="dim" type="number" min="1"
+      <input class="dim" type="number"
              value="${m.cols}" data-role="cols" data-idx="${i}">
     `;
     list.appendChild(row);
@@ -176,7 +192,8 @@ function renderBuilder() {
   list.querySelectorAll("input.dim").forEach((inp) => {
     inp.addEventListener("input", (e) => {
       const idx = Number(e.target.dataset.idx);
-      const val = Math.max(1, Number(e.target.value) || 1);
+      const raw = Number(e.target.value);
+      const val = Number.isFinite(raw) ? raw : 1;
       if (e.target.dataset.role === "cols") setCols(idx, val);
       else setRows(idx, val);
     });

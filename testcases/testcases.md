@@ -57,7 +57,7 @@ Mỗi ca kiểm tra chương trình phải ném `DimensionError` với thông đ
 | E02 | Mảng rỗng | `[]` | `Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận` |
 | E03 | Chứa phần tử bằng 0 | `[10, 0, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, nhận 0` |
 | E04 | Chứa phần tử âm | `[10, -3, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, nhận -3` |
-| E05 | Chứa số thực | `[10, 2.5, 5]` | `Phần tử tại vị trí 1 không phải số nguyên: 2.5` |
+| E05 | Chứa số thực | `[10, 2.5, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, nhận 2.5` |
 
 ---
 

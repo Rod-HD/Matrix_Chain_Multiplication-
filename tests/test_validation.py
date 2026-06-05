@@ -36,14 +36,14 @@ def test_non_positive(dims):
 
 @pytest.mark.parametrize("dims", [[10, 2.5, 5], [1, "2", 3], [1, 2.0, 3]])
 def test_not_integer(dims):
-    """Phần tử không phải int bị từ chối."""
-    with pytest.raises(DimensionError, match="không phải số nguyên"):
+    """Phần tử không phải int dương bị từ chối với thông điệp 'số nguyên dương'."""
+    with pytest.raises(DimensionError, match="số nguyên dương"):
         validate_dimensions(dims)
 
 
 def test_bool_rejected():
     """bool là lớp con của int nhưng không được coi là kích thước hợp lệ."""
-    with pytest.raises(DimensionError, match="không phải số nguyên"):
+    with pytest.raises(DimensionError, match="số nguyên dương"):
         validate_dimensions([True, 2, 3])
 
 

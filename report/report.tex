@@ -511,7 +511,7 @@ Hệ thống có hai lớp kiểm thử bổ trợ nhau.
 \paragraph{(a) Bộ testcase tường minh} nằm trong \texttt{testcases/}, gồm tệp dữ liệu \texttt{cases.json} và trình chấm \texttt{run\_testcases.py}. Dữ liệu chia hai nhóm:
 \begin{itemize}
   \item \emph{Nhóm hợp lệ} (12 ca): mỗi ca ghi mảng kích thước, chi phí kỳ vọng và dấu ngoặc kỳ vọng. Bốn ca đầu lấy từ ví dụ trong tài liệu và CLRS; tám ca còn lại thiết kế để phủ nhiều dạng cấu trúc: chuỗi hai ma trận (chỉ một cách nhân), trường hợp thứ tự ngoặc đổi chi phí gấp mười lần, kích thước tăng dần, giảm dần, bằng nhau, dao động mạnh, và hỗn hợp không quy luật.
-  \item \emph{Nhóm sai} (5 ca): phủ ba nhánh kiểm tra dữ liệu - mảng quá ngắn, phần tử không dương, phần tử không phải số nguyên - và đối chiếu thông điệp lỗi trùng khớp từng ký tự.
+  \item \emph{Nhóm sai} (5 ca): phủ hai nhánh kiểm tra dữ liệu - mảng quá ngắn và phần tử không phải số nguyên dương (bao gồm phần tử = 0, phần tử âm, và số thực) - và đối chiếu thông điệp lỗi trùng khớp từng ký tự.
 \end{itemize}
 
 \paragraph{(b) Bộ kiểm thử tự động} nằm trong \texttt{tests/}, chạy bằng \texttt{pytest}. Gồm test ví dụ cụ thể, test thông điệp lỗi, và một số test \emph{dựa trên tính chất} (property-based). Vì yêu cầu chỉ dùng thư viện chuẩn nên thay cho thư viện sinh dữ liệu chuyên dụng, các test tính chất dùng \texttt{random.Random(seed)} với seed cố định, mỗi test sinh từ 150 đến 200 mẫu ngẫu nhiên và có thể tái lập nhờ seed.

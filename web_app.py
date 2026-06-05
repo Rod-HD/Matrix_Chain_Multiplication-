@@ -37,16 +37,32 @@ def api_solve():
     data = request.get_json(force=True, silent=True) or {}
     raw = data.get("dims", [])
 
-    # Chuyển mọi phần tử về int; nếu không được thì báo lỗi rõ ràng.
+    # Nhận mảng từ JSON. Không ép int ở đây — giữ nguyên giá trị để
+    # validate_dimensions có thể phát hiện float, âm, ... và báo lỗi đúng.
     try:
-        dims = [int(x) for x in raw]
-    except (ValueError, TypeError):
-        return jsonify({"error": "Mọi phần tử kích thước phải là số nguyên"}), 400
+        raw_vals = list(raw)
+    except TypeError:
+        return jsonify({"error": "dims phải là một mảng"}), 400
+
+    # Chuyển về int nếu là số nguyên (kể cả float dạng 3.0), giữ nguyên float thật
+    dims_raw = []
+    for x in raw_vals:
+        try:
+            f = float(x)
+        except (ValueError, TypeError):
+            return jsonify({"error": "Mọi phần tử kích thước phải là số"}), 400
+        # Giữ nguyên kiểu: float thật (2.5) truyền vào để validator báo lỗi
+        if f == int(f) and isinstance(x, (int, float)) and not isinstance(x, bool):
+            dims_raw.append(int(f))
+        else:
+            dims_raw.append(f)
 
     try:
-        n = validate_dimensions(dims)
+        n = validate_dimensions(dims_raw)
     except DimensionError as exc:
         return jsonify({"error": str(exc)}), 400
+
+    dims = [int(x) for x in dims_raw]  # đã hợp lệ, an toàn ép int
 
     cost, split = bottom_up(dims)
     parens = optimal_parenthesization(split, 1, n)

@@ -45,19 +45,15 @@ def validate_dimensions(dims: Sequence[object]) -> int:
             "Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận"
         )
 
-    # 2) Kiểu: chỉ chấp nhận int thật. Loại bool vì bool là lớp con của int
-    #    trong Python (True/False sẽ lọt qua nếu chỉ dùng isinstance(x, int)).
+    # 2+3) Mọi phần tử phải là số nguyên dương. Kiểm tra theo thứ tự:
+    #   - kiểu: loại float, str, bool (bool là subclass của int nên cần kiểm tra riêng)
+    #   - dấu: loại <= 0
+    # Cả hai dạng sai đều thông báo "phải là số nguyên dương" vì
+    # người dùng chỉ cần biết giá trị đó không hợp lệ làm kích thước ma trận.
     for index, value in enumerate(dims):
-        if type(value) is not int:
+        if type(value) is not int or value <= 0:
             raise DimensionError(
-                f"Phần tử tại vị trí {index} không phải số nguyên: {value!r}"
-            )
-
-    # 3) Dấu: mọi kích thước phải là số nguyên dương.
-    for index, value in enumerate(dims):
-        if value <= 0:
-            raise DimensionError(
-                f"Phần tử tại vị trí {index} phải là số nguyên dương, nhận {value}"
+                f"Phần tử tại vị trí {index} phải là số nguyên dương, nhận {value!r}"
             )
 
     return len(dims) - 1

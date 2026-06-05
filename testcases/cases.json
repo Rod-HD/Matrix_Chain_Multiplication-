@@ -112,9 +112,9 @@
     },
     {
       "id": "E05",
-      "desc": "Chứa số thực, không phải số nguyên",
+      "desc": "Chứa số thực, không phải số nguyên dương",
       "dims": [10, 2.5, 5],
-      "expected_error": "Phần tử tại vị trí 1 không phải số nguyên: 2.5"
+      "expected_error": "Phần tử tại vị trí 1 phải là số nguyên dương, nhận 2.5"
     }
   ]
 }

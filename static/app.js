@@ -37,9 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const rawDims = btn.dataset.dims.trim();
       if (btn.classList.contains("example-err")) {
-        // Nạp trực tiếp vào ô nhập để hiển thị thông báo lỗi xác thực
-        $("dims").value = rawDims;
-        applyRawDims();
+        // Gửi thẳng tới API để hiển thị thông điệp lỗi xác thực từ server
+        solveRaw(rawDims);
         return;
       }
       loadDims(rawDims.split(/[\s,]+/).map(Number));
@@ -207,12 +206,18 @@ function applyCountInput() {
 }
 function applyRawDims() {
   const raw = $("dims").value.trim();
-  const p = raw
-    .split(/[\s,]+/)
-    .filter((t) => t.length > 0)
-    .map((t) => Number(t));
-  if (p.length < 2 || p.some((x) => !Number.isFinite(x) || x <= 0)) {
-    showError("Mảng kích thước phải gồm ít nhất 2 số nguyên dương");
+  const tokens = raw.split(/[\s,]+/).filter((t) => t.length > 0);
+  // Kiểm tra sơ bộ: đủ 2 token và toàn là số
+  const p = tokens.map((t) => Number(t));
+  if (tokens.length < 2 || p.some((x) => !Number.isFinite(x))) {
+    showError("Mảng kích thước phải gồm ít nhất 2 số");
+    return;
+  }
+  // Nếu có giá trị không hợp lệ (âm, 0, thực), gửi thẳng tới API để hiển thị lỗi
+  const allPositiveInt = p.every((x) => Number.isInteger(x) && x > 0);
+  if (!allPositiveInt) {
+    hideError();
+    solveRaw(raw);
     return;
   }
   hideError();
@@ -221,8 +226,26 @@ function applyRawDims() {
 
 // --- Gọi máy chủ giải ---------------------------------------------------------
 
+// Gửi mảng kích thước đã xây từ builder tới API.
 async function solve() {
-  const dims = buildP();
+  await solveRaw(null);
+}
+
+// Gửi tới API. Nếu dimsOverride là null thì dùng buildP().
+// Nếu dimsOverride là chuỗi thì parse giữ nguyên kiểu (float, âm, ...).
+async function solveRaw(rawString) {
+  let dims;
+  if (rawString === null) {
+    dims = buildP();
+  } else if (rawString === "") {
+    dims = [];
+  } else {
+    // Parse từng token, giữ nguyên float và âm để server validate đúng
+    dims = rawString.split(/[\s,]+/).filter((t) => t.length > 0).map((t) => {
+      const n = Number(t);
+      return Number.isFinite(n) ? n : t;
+    });
+  }
   hideError();
   try {
     const res = await fetch("/api/solve", {

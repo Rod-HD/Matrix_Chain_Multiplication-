@@ -212,10 +212,10 @@ P(1) = 1, \qquad P(n) = \sum_{k=1}^{n-1} P(k)\,P(n-k).
 Bài tập tập trung vào \emph{thuật toán thuần}: chỉ tính chi phí tối thiểu và thứ tự đặt ngoặc, không thực hiện phép nhân ma trận thật và không dùng thư viện ma trận. Hệ thống cần: nhận và kiểm tra mảng kích thước; tính bảng chi phí và bảng vị trí cắt; truy vết để dựng dấu ngoặc tối ưu; in bảng cùng đáp số. Ngoài phần lõi còn có giao diện dòng lệnh và một giao diện web minh hoạ từng bước.
 
 % =========================================================
-\section{Quy hoạch động}
+\section{Thuật toán sử dụng}
 % =========================================================
 
-Bài toán này dùng quy hoạch động vì hội đủ hai điều kiện đặc trưng của phương pháp~\cite{clrs,dpv}: lời giải tối ưu của chuỗi lớn ghép từ lời giải tối ưu của các đoạn con (\emph{cấu trúc con tối ưu}), và các đoạn con đó bị lặp lại nhiều lần khi giải đệ quy (\emph{bài toán con gối nhau}). Hai phần dưới làm rõ từng điều kiện; sau đó là công thức truy hồi rút ra từ chúng, ba cách cài đặt, và mã giả của bản chính.
+Thuật toán dùng cho bài toán này là \emph{quy hoạch động}. Sở dĩ chọn quy hoạch động vì bài toán hội đủ hai điều kiện đặc trưng của phương pháp~\cite{clrs,dpv}: lời giải tối ưu của chuỗi lớn ghép từ lời giải tối ưu của các đoạn con (\emph{cấu trúc con tối ưu}), và các đoạn con đó bị lặp lại nhiều lần khi giải đệ quy (\emph{bài toán con gối nhau}). Hai phần dưới làm rõ từng điều kiện; sau đó là công thức truy hồi rút ra từ chúng, ba cách cài đặt, và mã giả của bản chính.
 
 \subsection{Cấu trúc con tối ưu}
 Trong cách đặt ngoặc tối ưu của đoạn $A_i \cdots A_j$, phép nhân cuối cùng tách đoạn tại một vị trí $k$ thành $(A_i \cdots A_k)$ và $(A_{k+1} \cdots A_j)$. Hai phần này buộc phải tự tối ưu: nếu một phần còn đặt ngoặc tốt hơn được thì thay vào sẽ giảm tổng chi phí, trái với giả thiết đoạn lớn đã tối ưu. Vậy lời giải tối ưu của đoạn lớn luôn chứa lời giải tối ưu của các đoạn con -- đúng điều kiện cấu trúc con tối ưu.

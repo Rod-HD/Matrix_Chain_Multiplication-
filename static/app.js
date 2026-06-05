@@ -37,7 +37,14 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       const rawDims = btn.dataset.dims.trim();
       if (btn.classList.contains("example-err")) {
-        // Gửi thẳng tới API để hiển thị thông điệp lỗi xác thực từ server
+        // Mở phần nhập nhanh và điền giá trị để người dùng thấy input nào được dùng
+        const advEl = document.querySelector(".advanced");
+        if (advEl) advEl.open = true;
+        $("dims").value = rawDims;
+        // Ẩn kết quả cũ ngay trước khi gửi request
+        $("summary").classList.add("hidden");
+        $("tabs").classList.add("hidden");
+        document.querySelectorAll(".tab-content").forEach((c) => c.classList.add("hidden"));
         solveRaw(rawDims);
         return;
       }

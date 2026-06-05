@@ -190,7 +190,7 @@ Lấy ba ma trận $A_1\,(10 \times 100)$, $A_2\,(100 \times 5)$, $A_3\,(5 \time
 Hai cách cùng cho một tích nhưng lệch nhau gấp mười lần. Khi chuỗi dài, khoảng cách này còn lớn hơn nữa. Đó là lý do cần một thuật toán chọn thứ tự nhân tối ưu thay vì nhân tuần tự từ trái sang phải.
 
 \subsection{Phát biểu hình thức}
-Cho chuỗi $n$ ma trận $A_1, A_2, \ldots, A_n$, trong đó $A_i$ có kích thước $p_i \times p_{i+1}$. Toàn bộ kích thước được mô tả bằng mảng $p = [p_0, p_1, \ldots, p_n]$ gồm $n + 1$ phần tử (ở đây dùng chỉ số gốc 0, nên $A_i$ là $p_i \times p_{i+1}$ với $0 \le i \le n-1$).
+Cho chuỗi $n$ ma trận $A_1, A_2, \ldots, A_n$ (đánh số 1-based theo CLRS), trong đó $A_i$ có kích thước $p_{i-1} \times p_i$. Toàn bộ kích thước được mô tả bằng mảng $p = [p_0, p_1, \ldots, p_n]$ gồm $n + 1$ phần tử, đánh chỉ số gốc 0 ($p_0, \ldots, p_n$); như vậy $A_i = p_{i-1} \times p_i$ với $1 \le i \le n$.
 
 \begin{definition}[Bài toán MCM]
 Tìm cách đặt dấu ngoặc đầy đủ cho tích $A_1 A_2 \cdots A_n$ sao cho tổng số phép nhân vô hướng là nhỏ nhất.

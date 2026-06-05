@@ -1,602 +1,711 @@
 % =========================================================
-%  Báo cáo Bài tập lớn — Matrix Chain Multiplication
-%  Môn: CS112 — Phân tích và Thiết kế Thuật toán
-%  Trường: Đại học Công nghệ Thông tin — ĐHQG TP.HCM (UIT)
-%  GVHD: Huỳnh Thị Thanh Thương
-%
-%  Biên dịch: pdfLaTeX (mặc định) — không cần XeLaTeX/LuaLaTeX
-%    pdflatex report.tex
-%    pdflatex report.tex   (chạy 2 lần để cập nhật mục lục)
+%  Bao cao Bai tap lon - Matrix Chain Multiplication
+%  Mon: CS112 - Phan tich va Thiet ke Thuat toan
+%  Bien dich: tectonic report.tex
+%             hoac: xelatex report.tex (chay 2 lan de cap nhat muc luc)
 % =========================================================
 \documentclass[12pt,a4paper]{article}
 
-% --- ENCODING & FONT (pdfLaTeX — Unicode tiếng Việt qua inputenc + babel) ---
-\usepackage[utf8]{inputenc}
-\usepackage[T5]{fontenc}
-\usepackage[vietnamese]{babel}
-\usepackage{lmodern}    % font Latin Modern, hỗ trợ Unicode tốt
-\usepackage{textcomp}
+% --- FONT & NGON NGU (XeLaTeX, Unicode) ---
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{vietnamese}
+\usepackage{csquotes}
 
-% --- LAYOUT ---
-\usepackage[a4paper,margin=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+% --- TRINH BAY TRANG ---
+\usepackage[a4paper,top=2cm,bottom=1.6cm,left=2.5cm,right=2cm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \usepackage{indentfirst}
 \setlength{\parindent}{1.25em}
-\setlength{\parskip}{0.4em}
+\setlength{\parskip}{0.35em}
 
-% --- MATH ---
+% --- TOAN ---
 \usepackage{amsmath, amssymb, amsthm, mathtools}
+\newtheorem{definition}{Định nghĩa}
+\newtheorem{property}{Tính chất}
 
-% --- GRAPHICS / TABLES ---
+% --- BANG & HINH ---
 \usepackage{graphicx}
 \usepackage{array}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{longtable}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
 \usepackage{float}
 
-% --- COLORS & LINKS ---
+% --- MAU & LIEN KET ---
 \usepackage{xcolor}
-\definecolor{primary}{HTML}{1d4ed8}
-\definecolor{accent}{HTML}{92400e}
-\definecolor{codebg}{HTML}{F8FAFC}
-\definecolor{codeborder}{HTML}{E2E8F0}
-\definecolor{codekw}{HTML}{7C3AED}
-\definecolor{codestr}{HTML}{16A34A}
-\definecolor{codecmt}{HTML}{64748B}
+\definecolor{primary}{HTML}{1F4E79}
+\definecolor{codebg}{HTML}{F6F8FA}
+\definecolor{codeborder}{HTML}{D0D7DE}
+\definecolor{codekw}{HTML}{8250DF}
+\definecolor{codestr}{HTML}{0A7B34}
+\definecolor{codecmt}{HTML}{6E7781}
 \usepackage[colorlinks=true,linkcolor=primary,urlcolor=primary,citecolor=primary]{hyperref}
 
-% --- LISTINGS (CODE) ---
+% --- BIEU DO ---
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% --- CODE ---
 \usepackage{listings}
-\lstdefinestyle{pythonstyle}{
+\lstdefinestyle{py}{
   language=Python,
   basicstyle=\ttfamily\footnotesize,
   keywordstyle=\color{codekw}\bfseries,
   commentstyle=\color{codecmt}\itshape,
   stringstyle=\color{codestr},
-  numbers=left, numberstyle=\tiny\color{codecmt},
-  numbersep=8pt,
+  numbers=left, numberstyle=\tiny\color{codecmt}, numbersep=8pt,
   backgroundcolor=\color{codebg},
   frame=single, framerule=0.4pt, rulecolor=\color{codeborder},
   breaklines=true, breakatwhitespace=true,
-  showstringspaces=false,
-  tabsize=4,
-  captionpos=b,
-  inputencoding=utf8,
-  literate=
-    {á}{{\'a}}1 {à}{{\`a}}1 {ả}{{\h{a}}}1 {ã}{{\~a}}1 {ạ}{{\d{a}}}1
-    {â}{{\^a}}1 {ấ}{{\'\^a}}1 {ầ}{{\`\^a}}1 {ẩ}{{\h{\^a}}}1 {ẫ}{{\~\^a}}1 {ậ}{{\d{\^a}}}1
-    {ă}{{\u a}}1 {ắ}{{\'\u a}}1 {ằ}{{\`\u a}}1 {ẳ}{{\h{\u a}}}1 {ẵ}{{\~\u a}}1 {ặ}{{\d{\u a}}}1
-    {é}{{\'e}}1 {è}{{\`e}}1 {ẻ}{{\h e}}1 {ẽ}{{\~e}}1 {ẹ}{{\d e}}1
-    {ê}{{\^e}}1 {ế}{{\'\^e}}1 {ề}{{\`\^e}}1 {ể}{{\h{\^e}}}1 {ễ}{{\~\^e}}1 {ệ}{{\d{\^e}}}1
-    {í}{{\'i}}1 {ì}{{\`i}}1 {ỉ}{{\h i}}1 {ĩ}{{\~i}}1 {ị}{{\d i}}1
-    {ó}{{\'o}}1 {ò}{{\`o}}1 {ỏ}{{\h o}}1 {õ}{{\~o}}1 {ọ}{{\d o}}1
-    {ô}{{\^o}}1 {ố}{{\'\^o}}1 {ồ}{{\`\^o}}1 {ổ}{{\h{\^o}}}1 {ỗ}{{\~\^o}}1 {ộ}{{\d{\^o}}}1
-    {ơ}{{\o }}1 {ớ}{{\'\o }}1 {ờ}{{\`\o }}1 {ở}{{\h{\o }}}1 {ỡ}{{\~\o }}1 {ợ}{{\d{\o }}}1
-    {ú}{{\'u}}1 {ù}{{\`u}}1 {ủ}{{\h u}}1 {ũ}{{\~u}}1 {ụ}{{\d u}}1
-    {ư}{{\u u}}1 {ứ}{{\'\u u}}1 {ừ}{{\`\u u}}1 {ử}{{\h{\u u}}}1 {ữ}{{\~\u u}}1 {ự}{{\d{\u u}}}1
-    {ý}{{\'y}}1 {ỳ}{{\`y}}1 {ỷ}{{\h y}}1 {ỹ}{{\~y}}1 {ỵ}{{\d y}}1
-    {đ}{{\dj}}1 {Đ}{{\DJ}}1
+  showstringspaces=false, tabsize=4, captionpos=b,
 }
-\lstset{style=pythonstyle}
+\lstset{style=py}
 
-% --- ALGORITHM ---
+% fancyvrb: dùng cho các khối output chứa tiếng Việt (lstlisting không hỗ trợ
+% Unicode qua fontspec; fancyvrb kế thừa font hiện tại nên render đúng).
+\usepackage{fancyvrb}
+\DefineVerbatimEnvironment{VOutput}{Verbatim}{%
+  fontsize=\footnotesize,
+  frame=single,
+  rulecolor=\color{codeborder},
+  fillcolor=\color{codebg},
+  framesep=4pt,
+}
+
+% --- THUAT TOAN ---
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \floatname{algorithm}{Thuật toán}
-\renewcommand{\algorithmicrequire}{\textbf{Đầu vào:}}
-\renewcommand{\algorithmicensure}{\textbf{Đầu ra:}}
+\renewcommand{\algorithmicrequire}{\textbf{Vào:}}
+\renewcommand{\algorithmicensure}{\textbf{Ra:}}
 
-% --- HEADER & FOOTER ---
+% --- MUC LUC ---
+\usepackage{tocloft}
+\setcounter{tocdepth}{2}
+
+% --- DAU TRANG / CHAN TRANG ---
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\itshape Bài tập lớn — Matrix Chain Multiplication}
-\fancyhead[R]{\small\itshape CS112 — UIT}
-\fancyfoot[C]{\thepage}
+\fancyhead[L]{\raisebox{-0.2\height}{\includegraphics[height=10pt]{UIT.png}} \fontsize{8pt}{10pt}\selectfont Phân Tích Và Thiết Kế Thuật Toán}
+\fancyfoot[L]{\fontsize{9pt}{11pt}\selectfont Matrix Chain Multiplication}
+\fancyfoot[R]{\fontsize{9pt}{11pt}\selectfont \thepage}
 \renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
 
-% --- MISC ---
 \usepackage{enumitem}
 \setlist{itemsep=2pt, topsep=4pt}
+\setlength{\emergencystretch}{3em}
 
-% =========================================================
-%  TÀI LIỆU
-% =========================================================
 \begin{document}
 
-% --- TRANG BÌA ---
+% =========================================================
+%  TRANG BIA
+% =========================================================
 \begin{titlepage}
-  \centering
-  \vspace*{1.5cm}
+\begin{center}
+{\fontsize{14pt}{16pt}\selectfont \textbf{\MakeUppercase{Đại Học Quốc Gia Thành Phố Hồ Chí Minh
+\vspace{2mm} \\ Trường Đại Học Công Nghệ Thông Tin
+\vspace{3mm} \\ Khoa Khoa Học Máy Tính}}}
+\end{center}
 
-  {\large\textbf{ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH}}\\[0.2cm]
-  {\large\textbf{TRƯỜNG ĐẠI HỌC CÔNG NGHỆ THÔNG TIN}}\\[0.2cm]
-  {\large\textbf{KHOA KHOA HỌC MÁY TÍNH}}
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=6.0cm]{UIT.png}
+\end{center}
+\end{figure}
 
-  \vspace{1.5cm}
-  \includegraphics[width=0.22\textwidth]{example-image-a}\\[0.2cm]
-  {\footnotesize \itshape (Thay placeholder bằng logo UIT nếu cần)}
+\begin{center}
+{\textbf{\fontsize{14pt}{16pt}\selectfont PHÂN TÍCH VÀ THIẾT KẾ THUẬT TOÁN}}
+\vspace{4mm}
 
-  \vspace{1.5cm}
-  {\Large\bfseries BÁO CÁO BÀI TẬP LỚN}\\[0.4cm]
-  {\large Môn: CS112 — Phân tích và Thiết kế Thuật toán}
+\rule{\textwidth}{0.4pt}
+\vspace{3mm}
 
-  \vspace{1.5cm}
-  \rule{\linewidth}{0.5mm}\\[0.4cm]
-  {\Huge\bfseries\color{primary} Matrix Chain Multiplication}\\[0.2cm]
-  {\large\itshape Quy hoạch động Bottom-Up theo CLRS chương 15.2}\\[0.4cm]
-  \rule{\linewidth}{0.5mm}
+{\textbf{\fontsize{14pt}{16pt}\selectfont BÁO CÁO BÀI TẬP LỚN}}
+\vspace{3mm}
 
-  \vspace{2cm}
-  \begin{tabular}{ll}
-    \textbf{Giảng viên hướng dẫn:} & ThS. Huỳnh Thị Thanh Thương \\[0.3em]
-    \textbf{Sinh viên thực hiện:}  & \textit{[Họ và tên sinh viên]} \\[0.3em]
-    \textbf{MSSV:}                 & \textit{[MSSV]} \\[0.3em]
-    \textbf{Lớp:}                  & \textit{[Mã lớp]} \\[0.3em]
-    \textbf{Học kỳ:}               & \textit{[Học kỳ — Năm học]} \\
-  \end{tabular}
+{\textbf{\fontsize{22pt}{26pt}\selectfont Matrix Chain Multiplication}}
+\vspace{3mm}
 
-  \vfill
-  {\large TP. Hồ Chí Minh, \today}
+{\fontsize{13pt}{15pt}\selectfont \itshape Quy hoạch động trên đoạn - ba lời giải đối chiếu}
+\vspace{3mm}
+
+\rule{\textwidth}{0.4pt}
+\end{center}
+
+\vspace{6mm}
+\begin{center}
+{\fontsize{12pt}{12pt}\selectfont \textbf{\begin{tabular}{rl}
+Giảng viên hướng dẫn: & TS. Huỳnh Thị Thanh Thương \\
+[3mm]
+Lớp: & CS112.Q25
+\end{tabular}}}
+\end{center}
+\vspace{3mm}
+
+\begin{center}
+\begin{tabular}{clcc}
+& \textbf{\fontsize{12pt}{14pt}\selectfont Họ và Tên} & \textbf{\fontsize{12pt}{14pt}\selectfont MSSV} \\
+[2mm]
+& {\fontsize{12pt}{14pt}\selectfont Hoàng Quốc Duy} & {\fontsize{12pt}{14pt}\selectfont 24520373} \\
+\end{tabular}
+\end{center}
+
+\vfill
+\begin{center}
+{\fontsize{10pt}{12pt}\selectfont \textit{Thành phố Hồ Chí Minh, tháng 6 năm 2026}}
+\end{center}
 \end{titlepage}
 
-% --- LỜI CAM ĐOAN ---
-\section*{Lời cam đoan}
-\addcontentsline{toc}{section}{Lời cam đoan}
-
-Tôi cam đoan rằng báo cáo này là kết quả nghiên cứu và triển khai của cá nhân tôi. Mọi tham khảo từ các nguồn bên ngoài đều đã được trích dẫn rõ ràng. Phần triển khai bằng Python (gồm thuật toán lõi, kiểm thử, và giao diện web demo) được viết hoàn toàn trong khuôn khổ bài tập lớn của môn \textbf{CS112 — Phân tích và Thiết kế Thuật toán}.
-
-\vspace{0.6em}
-\hfill TP. Hồ Chí Minh, \today
-
-\hfill \textit{Sinh viên thực hiện}
-
-\vspace{2em}
-\hfill \textit{[Ký và ghi rõ họ tên]}
-
+% --- MUC LUC ---
+\pagenumbering{gobble}
+\tocloftpagestyle{fancy}
 \newpage
-
-% --- TÓM TẮT ---
-\section*{Tóm tắt}
-\addcontentsline{toc}{section}{Tóm tắt}
-
-Báo cáo trình bày quá trình phân tích, thiết kế và triển khai bài toán \textbf{Matrix Chain Multiplication (MCM)} bằng phương pháp \textbf{Quy hoạch động Bottom-Up} theo mã giả CLRS chương~15.2. Hệ thống được xây dựng bằng \textbf{Python 3.10+} (chỉ sử dụng thư viện chuẩn cho phần lõi), bám đúng từng dòng mã giả của giáo trình bằng kỹ thuật \emph{1-based padding} để code đọc gần với toán học của slide bài giảng.
-
-Phần triển khai gồm bốn module độc lập (\texttt{validator}, \texttt{solver}, \texttt{formatter}, \texttt{cli}) với 43 test case (gồm 11 \emph{property-based test} kèm cross-check brute-force) đảm bảo tính đúng đắn về mặt toán học và định dạng. Ngoài giao diện dòng lệnh (CLI), một \textbf{ứng dụng web demo} viết bằng \textbf{Flask} được kèm theo để minh hoạ trực quan: bảng $m$, bảng $s$, các bước tính toán theo từng độ dài chuỗi con, cây phân tách (\emph{parenthesization tree}) và biểu thức ngoặc tối ưu.
-
-Toàn bộ kết quả đối chiếu khớp với các ví dụ kinh điển trong giáo trình CLRS và slide bài giảng môn học.
-
-\textbf{Từ khoá:} Matrix Chain Multiplication, Quy hoạch động, Bottom-Up, CLRS, Property-Based Testing, Flask.
-
-\newpage
-
-% --- MỤC LỤC ---
+\fancyfoot[R]{}
 \tableofcontents
+
 \newpage
+\fancyfoot[R]{\fontsize{8pt}{10pt}\selectfont Trang {\thepage}}
+\pagenumbering{arabic}
+\setcounter{page}{1}
 
 % =========================================================
-\section{Giới thiệu}
+\section{Giới thiệu bài toán}
 % =========================================================
 
-\subsection{Bối cảnh}
-Phép nhân hai ma trận $A$ kích thước $p \times q$ với $B$ kích thước $q \times r$ cần đúng $p \cdot q \cdot r$ phép nhân vô hướng. Khi nhân chuỗi $n$ ma trận $A_1 A_2 \cdots A_n$, do phép nhân ma trận có tính \emph{kết hợp}, có nhiều cách đặt ngoặc khác nhau. Mỗi cách cho kết quả tích giống nhau nhưng \emph{tổng số phép nhân vô hướng} có thể khác nhau \emph{rất nhiều}.
+\subsection{Vì sao thứ tự nhân lại quan trọng}
+Nhân hai ma trận $A$ cỡ $p \times q$ với $B$ cỡ $q \times r$ cho ra ma trận $p \times r$ và tốn đúng $p \cdot q \cdot r$ phép nhân vô hướng. Phép nhân ma trận có tính kết hợp: $(AB)C = A(BC)$. Kết quả cuối cùng không đổi, nhưng số phép nhân để đi tới kết quả thì phụ thuộc vào cách ta gom nhóm.
 
-Ví dụ với $A_1 (10 \times 100), A_2 (100 \times 5), A_3 (5 \times 50)$:
+Lấy ba ma trận $A_1\,(10 \times 100)$, $A_2\,(100 \times 5)$, $A_3\,(5 \times 50)$:
 \begin{itemize}
-  \item $((A_1 A_2) A_3)$: $10\cdot100\cdot5 + 10\cdot5\cdot50 = 5000 + 2500 = \mathbf{7500}$ phép nhân.
-  \item $(A_1 (A_2 A_3))$: $100\cdot5\cdot50 + 10\cdot100\cdot50 = 25000 + 50000 = \mathbf{75000}$ phép nhân.
+  \item $((A_1 A_2) A_3)$: $10 \cdot 100 \cdot 5 + 10 \cdot 5 \cdot 50 = 5000 + 2500 = \mathbf{7500}$.
+  \item $(A_1 (A_2 A_3))$: $100 \cdot 5 \cdot 50 + 10 \cdot 100 \cdot 50 = 25000 + 50000 = \mathbf{75000}$.
 \end{itemize}
+Hai cách cùng cho một tích nhưng lệch nhau gấp mười lần. Khi chuỗi dài, khoảng cách này còn lớn hơn nữa. Đó là lý do cần một thuật toán chọn thứ tự nhân tối ưu thay vì nhân tuần tự từ trái sang phải.
 
-Cách đặt ngoặc đầu tiên \emph{nhanh hơn 10 lần}. Bài toán MCM đặt ra: cho trước kích thước của $n$ ma trận, tìm cách đặt ngoặc tối ưu để \textbf{tối thiểu hoá} tổng số phép nhân vô hướng.
+\subsection{Phát biểu hình thức}
+Cho chuỗi $n$ ma trận $A_1, A_2, \ldots, A_n$, trong đó $A_i$ có kích thước $p_i \times p_{i+1}$. Toàn bộ kích thước được mô tả bằng mảng $p = [p_0, p_1, \ldots, p_n]$ gồm $n + 1$ phần tử (ở đây dùng chỉ số gốc 0, nên $A_i$ là $p_i \times p_{i+1}$ với $0 \le i \le n-1$).
 
-\subsection{Mục tiêu của bài tập lớn}
-\begin{enumerate}
-  \item Phát biểu bài toán MCM một cách hình thức.
-  \item Phân tích cấu trúc con tối ưu, thiết kế công thức truy hồi và thuật toán Bottom-Up bằng quy hoạch động.
-  \item Triển khai thuật toán bằng Python theo đúng mã giả CLRS, có kiểm thử tự động (unit + property-based).
-  \item Xây dựng giao diện web demo (Flask) để minh hoạ trực quan các bước, bảng $m$/$s$ và cây phân tách.
-  \item Kiểm chứng độ phức tạp $\Theta(n^3)$ qua test hiệu năng và đối chiếu với các ví dụ trong giáo trình.
-\end{enumerate}
+\begin{definition}[Bài toán MCM]
+Tìm cách đặt dấu ngoặc đầy đủ cho tích $A_1 A_2 \cdots A_n$ sao cho tổng số phép nhân vô hướng là nhỏ nhất.
+\end{definition}
 
-\subsection{Đóng góp chính}
-\begin{itemize}
-  \item Cài đặt bám sát từng dòng mã giả CLRS bằng \emph{1-based padding}, giúp ánh xạ trực tiếp giữa code Python và mã giả không cần dịch chỉ số.
-  \item Bộ kiểm thử 43 test gồm 11 \emph{property-based test} thuần thư viện chuẩn (không phụ thuộc \texttt{hypothesis}), kèm cross-check brute-force liệt kê \emph{toàn bộ} parenthesization với $n \le 6$.
-  \item Giao diện web demo trực quan với ba tab: bảng $m$/$s$, các bước tính toán có nút \emph{Trước/Sau/Tự động}, cây phân tách của biểu thức tối ưu.
-\end{itemize}
-
-% =========================================================
-\section{Phát biểu bài toán}
-% =========================================================
-
-\subsection{Đầu vào và đầu ra}
-\textbf{Đầu vào.} Một mảng số nguyên dương $p = [p_0, p_1, \ldots, p_n]$ gồm $n+1$ phần tử, mô tả chuỗi $n$ ma trận:
+\subsection{Quy mô không gian tìm kiếm}
+Gọi $P(n)$ là số cách đặt dấu ngoặc cho $n$ ma trận. Cách đặt ngoặc ngoài cùng chia chuỗi thành hai phần tại một vị trí $k$ nào đó, nên
 \[
-A_i \in \mathbb{R}^{p_{i-1} \times p_i}, \qquad 1 \le i \le n.
+P(1) = 1, \qquad P(n) = \sum_{k=1}^{n-1} P(k)\,P(n-k).
 \]
+Đây chính là truy hồi của \emph{số Catalan}: $P(n) = C_{n-1}$, và $C_{n-1} = \Omega\!\left(4^n / n^{3/2}\right)$ tăng theo hàm mũ. Duyệt mọi cách đặt ngoặc là bất khả thi ngay với $n$ vừa phải. Mục~\ref{sec:complexity} đo cụ thể sự bùng nổ này.
 
-\textbf{Đầu ra.}
-\begin{itemize}
-  \item $m[1, n]$ — số phép nhân vô hướng tối thiểu.
-  \item Bảng $s$ ghi vị trí tách tối ưu, từ đó truy vết được \emph{Optimal Parenthesization}.
-\end{itemize}
+\subsection{Phạm vi}
+Bài tập tập trung vào \emph{thuật toán thuần}: chỉ tính chi phí tối thiểu và thứ tự đặt ngoặc, không thực hiện phép nhân ma trận thật và không dùng thư viện ma trận. Hệ thống cần: nhận và kiểm tra mảng kích thước; tính bảng chi phí và bảng vị trí cắt; truy vết để dựng dấu ngoặc tối ưu; in bảng cùng đáp số. Ngoài phần lõi còn có giao diện dòng lệnh và một giao diện web minh hoạ từng bước.
 
-\subsection{Định nghĩa hình thức}
-Đặt $m[i, j]$ là số phép nhân vô hướng tối thiểu để tính tích $A_i A_{i+1} \cdots A_j$ với $1 \le i \le j \le n$. Khi đó:
-\begin{equation}\label{eq:mcm}
-m[i, j] =
-\begin{cases}
-0, & \text{nếu } i = j, \\[6pt]
-\displaystyle \min_{i \le k < j} \Big\{ m[i, k] + m[k+1, j] + p_{i-1}\, p_k\, p_j \Big\}, & \text{nếu } i < j.
-\end{cases}
-\end{equation}
-
-Đáp số cuối là $m[1, n]$.
+% =========================================================
+\section{Thuật toán sử dụng}
+% =========================================================
 
 \subsection{Cấu trúc con tối ưu}
-Một parenthesization tối ưu của $A_i \cdots A_j$ phải tách tại một vị trí $k$ nào đó ($i \le k < j$) thành hai chuỗi con $A_i \cdots A_k$ và $A_{k+1} \cdots A_j$. Hai chuỗi con đó cũng phải được parenthesize tối ưu — đây là tính chất \emph{tối ưu lồng tối ưu} điển hình của quy hoạch động.
+Quan sát mấu chốt: trong cách đặt ngoặc tối ưu của $A_i \cdots A_j$, phép nhân cuối cùng tách chuỗi tại một vị trí $k$ thành $(A_i \cdots A_k)$ và $(A_{k+1} \cdots A_j)$. Nếu một trong hai phần đó \emph{không} được đặt ngoặc tối ưu, ta có thể thay bằng cách tốt hơn để giảm tổng chi phí -- mâu thuẫn. Vậy lời giải tối ưu của bài toán lớn chứa lời giải tối ưu của các bài toán con: đây là điều kiện \emph{cấu trúc con tối ưu}, tiền đề để áp dụng quy hoạch động~\cite{clrs,dpv}.
 
-\subsection{Phân tích trùng lặp con}
-Số chuỗi con phân biệt $(i, j)$ là $\binom{n}{2} + n = \Theta(n^2)$. Nếu giải đệ quy không nhớ, mỗi chuỗi con sẽ được tính lại nhiều lần dẫn đến độ phức tạp \emph{số Catalan} $\Omega(4^n / n^{3/2})$. Do đó cần \textbf{quy hoạch động} để mỗi chuỗi con chỉ tính một lần.
+\subsection{Công thức truy hồi}
+Gọi $\mathrm{cost}[i][j]$ là số phép nhân vô hướng tối thiểu để nhân đoạn $A_i \cdots A_j$ (chỉ số 1-based theo CLRS, $1 \le i \le j \le n$). Ma trận $A_i$ có kích thước $p[i-1] \times p[i]$ với $p$ là mảng kích thước 0-based gồm $n+1$ phần tử. Do đó
 
-% =========================================================
-\section{Thuật toán}
-% =========================================================
+\[
+\mathrm{cost}[i][j] =
+\begin{cases}
+0 & \text{nếu } i = j, \\[6pt]
+\displaystyle\min_{i \le k < j} \Bigl\{ \mathrm{cost}[i][k] + \mathrm{cost}[k+1][j] + p[i{-}1] \cdot p[k] \cdot p[j] \Bigr\} & \text{nếu } i < j.
+\end{cases}
+\]
 
-\subsection{Mã giả \texttt{MATRIX-CHAIN-ORDER}}
+Đáp số là $\mathrm{cost}[1][n]$. Bảng $\mathrm{split}[i][j]$ lưu vị trí $k$ đạt cực tiểu, dùng để truy vết lại dấu ngoặc.
+
+\paragraph{Quy ước chỉ số.} Code tuân theo đúng ký hiệu của Cormen: ma trận $A_1 \ldots A_n$ (1-based), bảng kích thước $(n{+}1) \times (n{+}1)$ với padding tại index 0, công thức $p[i-1] \cdot p[k] \cdot p[j]$~\cite{clrs}. DPV~\cite{dpv} dùng ký hiệu tương đương.
+
+\subsection{Ba lời giải}
+Để thấy rõ vai trò của quy hoạch động, hệ thống cài đặt ba lời giải cho cùng công thức trên.
+
+\paragraph{(1) Đệ quy thuần.} Dịch trực tiếp công thức truy hồi thành đệ quy, không lưu lại kết quả đoạn con. Cùng một đoạn bị tính lại rất nhiều lần nên số lần gọi tăng theo hàm mũ. Bản này chỉ dùng để minh hoạ, đúng như cách GeeksforGeeks và CP-Algorithms giới thiệu trước khi chuyển sang quy hoạch động.
+
+\paragraph{(2) Đệ quy có ghi nhớ (top-down).} Vẫn đệ quy như trên nhưng lưu kết quả mỗi đoạn $(i, j)$ vào bộ nhớ đệm. Mỗi đoạn chỉ tính một lần, có $O(n^2)$ đoạn, mỗi đoạn quét $O(n)$ vị trí cắt, cho độ phức tạp $O(n^3)$.
+
+\paragraph{(3) Lấp bảng từ dưới lên (bottom-up).} Tính các đoạn theo \emph{độ dài tăng dần}. Đây là bản chính, có truy vết dấu ngoặc và được dùng cho CLI lẫn web.
+
+\subsection{Mã giả}
+Điểm khó hình dung nhất của bài toán là thứ tự lấp bảng: không lấp theo hàng hay cột mà theo \emph{độ dài đoạn} $\ell = 2, 3, \ldots, n$. Khi tính một đoạn dài $\ell$, mọi đoạn ngắn hơn mà nó cần đều đã có sẵn~\cite{clrs,dpv}.
 
 \begin{algorithm}[H]
-\caption{\textsc{Matrix-Chain-Order}$(p)$}
+\caption{Bottom-Up-MCM$(p)$}
 \begin{algorithmic}[1]
-\Require Mảng $p[0..n]$ gồm $n+1$ số nguyên dương.
-\Ensure Bảng $m[1..n, 1..n]$ và bảng $s[1..n-1, 2..n]$.
-\State $n \gets p.\text{length} - 1$
-\State Cấp phát hai bảng $m$ và $s$
-\For{$i \gets 1$ \textbf{to} $n$}
-  \State $m[i, i] \gets 0$
+\Require Mảng kích thước $p[0..n]$ ($n+1$ phần tử, 0-based)
+\Ensure Bảng $\mathrm{cost}[1..n][1..n]$ và $\mathrm{split}[1..n][1..n]$
+\State $n \leftarrow \text{length}(p) - 1$
+\For{$i \leftarrow 1$ \textbf{to} $n$}
+    \State $\mathrm{cost}[i][i] \leftarrow 0$
 \EndFor
-\For{$\ell \gets 2$ \textbf{to} $n$} \Comment{$\ell$ là độ dài chuỗi con}
-  \For{$i \gets 1$ \textbf{to} $n - \ell + 1$}
-    \State $j \gets i + \ell - 1$
-    \State $m[i, j] \gets +\infty$
-    \For{$k \gets i$ \textbf{to} $j - 1$}
-      \State $q \gets m[i, k] + m[k+1, j] + p_{i-1} \cdot p_k \cdot p_j$
-      \If{$q < m[i, j]$}
-        \State $m[i, j] \gets q$
-        \State $s[i, j] \gets k$
-      \EndIf
+\For{$\ell \leftarrow 2$ \textbf{to} $n$} \Comment{$\ell$: độ dài đoạn}
+    \For{$i \leftarrow 1$ \textbf{to} $n - \ell + 1$}
+        \State $j \leftarrow i + \ell - 1$
+        \State $\mathrm{cost}[i][j] \leftarrow \infty$
+        \For{$k \leftarrow i$ \textbf{to} $j - 1$}
+            \State $q \leftarrow \mathrm{cost}[i][k] + \mathrm{cost}[k+1][j] + p[i{-}1] \cdot p[k] \cdot p[j]$
+            \If{$q < \mathrm{cost}[i][j]$}
+                \State $\mathrm{cost}[i][j] \leftarrow q$
+                \State $\mathrm{split}[i][j] \leftarrow k$
+            \EndIf
+        \EndFor
     \EndFor
-  \EndFor
 \EndFor
-\State \Return $(m, s)$
+\State \Return $\mathrm{cost}, \mathrm{split}$
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Mã giả \texttt{PRINT-OPTIMAL-PARENS}}
-
 \begin{algorithm}[H]
-\caption{\textsc{Print-Optimal-Parens}$(s, i, j)$}
+\caption{Build-Parens$(\mathrm{split}, i, j)$}
 \begin{algorithmic}[1]
 \If{$i = j$}
-  \State In ``$A_i$''
+    \State \Return \enquote{$A_i$}
 \Else
-  \State In ``$($''
-  \State \textsc{Print-Optimal-Parens}$(s, i, s[i, j])$
-  \State \textsc{Print-Optimal-Parens}$(s, s[i, j] + 1, j)$
-  \State In ``$)$''
+    \State $k \leftarrow \mathrm{split}[i][j]$
+    \State \Return \enquote{$($} $\;\Vert\;$ Build-Parens$(\mathrm{split}, i, k)$ $\;\Vert\;$ Build-Parens$(\mathrm{split}, k+1, j)$ $\;\Vert\;$ \enquote{$)$}
 \EndIf
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Phân tích độ phức tạp}
+\subsection{Cài đặt Python}
+Mã nguồn chia thành các module nhỏ, mỗi module một việc: \texttt{validation.py} (kiểm tra dữ liệu), \texttt{core.py} (ba lời giải + truy vết + kiểm tra chéo), \texttt{display.py} (định dạng bảng), \texttt{cli.py} (vào/ra dòng lệnh). Hai đoạn dưới trích nguyên văn từ \texttt{src/mcm2/core.py}.
 
-\begin{itemize}
-  \item \textbf{Thời gian.} Ba vòng lặp lồng nhau theo $\ell, i, k$, mỗi cặp $(i, j, k)$ thực hiện $O(1)$ phép tính. Tổng số phép gán $q$ là
-  \[
-  \sum_{\ell=2}^{n} \sum_{i=1}^{n-\ell+1} (\ell - 1) \;=\; \binom{n}{3} + \binom{n}{2} \;=\; \Theta(n^3).
-  \]
-  \item \textbf{Không gian.} Hai bảng $m$ và $s$ kích thước $\Theta(n^2)$, đệ quy in parens có chiều sâu tối đa $O(n)$. Tổng cộng $\Theta(n^2)$.
-  \item \textbf{So sánh với đệ quy không nhớ.} Đệ quy thuần có độ phức tạp $\Omega(4^n / n^{3/2})$ (số Catalan), \emph{vô vọng} với $n$ lớn. Quy hoạch động cải thiện về $\Theta(n^3)$.
-\end{itemize}
+\begin{lstlisting}[caption={Lấp bảng từ dưới lên -- trích từ \texttt{core.py}}]
+def bottom_up(dims):
+    n = validate_dimensions(dims)
+    p = list(dims)
 
-\subsection{Ví dụ chạy tay (CLRS kinh điển)}
+    # Bang kich thuoc (n+1) x (n+1); o index 0 la padding khong dung.
+    cost = [[0] * (n + 1) for _ in range(n + 1)]
+    split = [[0] * (n + 1) for _ in range(n + 1)]
 
-Cho $p = [30, 35, 15, 5, 10, 20, 25]$, ta có 6 ma trận:
-\[
-A_1: 30{\times}35,\; A_2: 35{\times}15,\; A_3: 15{\times}5,\; A_4: 5{\times}10,\; A_5: 10{\times}20,\; A_6: 20{\times}25.
-\]
+    # Duong cheo cost[i][i] = 0 cho moi i = 1..n (da san bang 0).
+    for i in range(1, n + 1):
+        cost[i][i] = 0
 
-Sau khi chạy thuật toán, bảng $m$ và $s$ thu được như Bảng~\ref{tab:m-clrs} và \ref{tab:s-clrs}. Đáp số cuối:
-\[
-m[1, 6] = 15{,}125, \qquad \text{Optimal Parens} = ((A_1(A_2A_3))((A_4A_5)A_6)).
-\]
+    # Lap bang theo do dai doan tang dan (length = 2..n).
+    for length in range(2, n + 1):
+        for i in range(1, n - length + 2):
+            j = i + length - 1
+            best = INF
+            best_k = i
+            for k in range(i, j):
+                # Cong thuc CLRS 15.2: q = cost[i][k]+cost[k+1][j]+p[i-1]*p[k]*p[j]
+                q = cost[i][k] + cost[k + 1][j] + p[i - 1] * p[k] * p[j]
+                if q < best:
+                    best = q
+                    best_k = k
+            cost[i][j] = best
+            split[i][j] = best_k
+
+    return cost, split
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Truy vết dấu ngoặc -- trích từ \texttt{core.py}}]
+def optimal_parenthesization(split, i, j):
+    if i == j:
+        return f"A{i}"            # ten ma tran 1-based theo CLRS
+    k = split[i][j]
+    left = optimal_parenthesization(split, i, k)
+    right = optimal_parenthesization(split, k + 1, j)
+    return f"({left}{right})"
+\end{lstlisting}
+
+\subsection{Kiểm tra chéo nội bộ}
+Sau khi lấp bảng và dựng dấu ngoặc, hàm \texttt{solve} tính lại chi phí một lần nữa, lần này \emph{chỉ dựa trên bảng split} (độc lập với bảng cost), rồi so với $\mathrm{cost}[1][n]$. Nếu hai con số lệch nhau, chương trình báo lỗi ngay thay vì in kết quả sai.
+
+% =========================================================
+\section{Ví dụ minh họa thuật toán}
+% =========================================================
+
+Xét ví dụ kinh điển với $p = [30, 35, 15, 5, 10, 20, 25]$, tức $n = 6$ ma trận: $A_1\,(30 \times 35)$, $A_2\,(35 \times 15)$, $A_3\,(15 \times 5)$, $A_4\,(5 \times 10)$, $A_5\,(10 \times 20)$, $A_6\,(20 \times 25)$. Ví dụ này có trong cả CLRS lẫn slide bài giảng nên tiện đối chiếu.
+
+\subsection{Lấp bảng theo độ dài đoạn}
+
+\textbf{Khởi tạo:} $\mathrm{cost}[i][i] = 0$ cho mọi $i = 1..6$.
+
+\textbf{$\ell = 2$} (đoạn 2 ma trận, chỉ một vị trí cắt $k = i$):
 
 \begin{table}[H]
+\centering\small
+\begin{tabular}{c c r r c}
+\toprule
+Đoạn & $k$ & $q = p[i{-}1] \cdot p[k] \cdot p[j]$ & $\mathrm{cost}$ & $\mathrm{split}$ \\
+\midrule
+$A_1A_2$ & 1 & $p[0] \cdot p[1] \cdot p[2] = 30 \cdot 35 \cdot 15 = 15750$ & 15750 & 1 \\
+$A_2A_3$ & 2 & $p[1] \cdot p[2] \cdot p[3] = 35 \cdot 15 \cdot 5 = 2625$ & 2625 & 2 \\
+$A_3A_4$ & 3 & $p[2] \cdot p[3] \cdot p[4] = 15 \cdot 5 \cdot 10 = 750$ & 750 & 3 \\
+$A_4A_5$ & 4 & $p[3] \cdot p[4] \cdot p[5] = 5 \cdot 10 \cdot 20 = 1000$ & 1000 & 4 \\
+$A_5A_6$ & 5 & $p[4] \cdot p[5] \cdot p[6] = 10 \cdot 20 \cdot 25 = 5000$ & 5000 & 5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{$\ell = 3$} (hai lựa chọn $k$, chọn cực tiểu -- in đậm):
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{c c l r c}
+\toprule
+Đoạn & $k$ & $q = \mathrm{cost}[i][k] + \mathrm{cost}[k+1][j] + p[i{-}1] \cdot p[k] \cdot p[j]$ & $\mathrm{cost}$ & $\mathrm{split}$ \\
+\midrule
+\multirow{2}{*}{$A_1{:}A_3$} & 1 & $0 + 2625 + 30 \cdot 35 \cdot 5 = \mathbf{7875}$ & \multirow{2}{*}{7875} & \multirow{2}{*}{1} \\
+                             & 2 & $15750 + 0 + 30 \cdot 15 \cdot 5 = 18000$ & & \\
+\midrule
+\multirow{2}{*}{$A_2{:}A_4$} & 2 & $0 + 750 + 35 \cdot 15 \cdot 10 = 6000$ & \multirow{2}{*}{4375} & \multirow{2}{*}{3} \\
+                             & 3 & $2625 + 0 + 35 \cdot 5 \cdot 10 = \mathbf{4375}$ & & \\
+\midrule
+\multirow{2}{*}{$A_3{:}A_5$} & 3 & $0 + 1000 + 15 \cdot 5 \cdot 20 = \mathbf{2500}$ & \multirow{2}{*}{2500} & \multirow{2}{*}{3} \\
+                             & 4 & $750 + 0 + 15 \cdot 10 \cdot 20 = 3750$ & & \\
+\midrule
+\multirow{2}{*}{$A_4{:}A_6$} & 4 & $0 + 5000 + 5 \cdot 10 \cdot 25 = 6250$ & \multirow{2}{*}{3500} & \multirow{2}{*}{5} \\
+                             & 5 & $1000 + 0 + 5 \cdot 20 \cdot 25 = \mathbf{3500}$ & & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{$\ell = 4, 5, 6$} (giá trị cực tiểu in đậm):
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{c l c c}
+\toprule
+Đoạn & Các ứng viên $q$ theo $k$ & $\mathrm{cost}$ & $\mathrm{split}$ \\
+\midrule
+$A_1{:}A_4$ & $k{=}1{:}14875,\ k{=}2{:}21000,\ k{=}3{:}\mathbf{9375}$ & 9375 & 3 \\
+$A_2{:}A_5$ & $k{=}2{:}13000,\ k{=}3{:}\mathbf{7125},\ k{=}4{:}11375$ & 7125 & 3 \\
+$A_3{:}A_6$ & $k{=}3{:}\mathbf{5375},\ k{=}4{:}9500,\ k{=}5{:}10000$ & 5375 & 3 \\
+\midrule
+$A_1{:}A_5$ & $k{=}1{:}28125,\ k{=}2{:}27250,\ k{=}3{:}\mathbf{11875},\ k{=}4{:}15375$ & 11875 & 3 \\
+$A_2{:}A_6$ & $k{=}2{:}18500,\ k{=}3{:}\mathbf{10500},\ k{=}4{:}18125,\ k{=}5{:}24625$ & 10500 & 3 \\
+\midrule
+$A_1{:}A_6$ & $k{=}1{:}36750,\ k{=}2{:}32375,\ k{=}3{:}\mathbf{15125},\ k{=}4{:}21875,\ k{=}5{:}26875$ & 15125 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Hai bảng đầy đủ}
+Sau khi lấp xong, hai bảng (nhãn hàng/cột theo chỉ số 1-based như chương trình in ra) là:
+
+\begin{table}[H]
+\centering\small
+\begin{minipage}{0.52\textwidth}
 \centering
-\caption{Bảng $m$ cho $p = [30, 35, 15, 5, 10, 20, 25]$.}
-\label{tab:m-clrs}
-\small
+\textbf{Bảng chi phí}\\[2pt]
 \begin{tabular}{c|rrrrrr}
-\toprule
-$i \backslash j$ & $j=1$ & $j=2$ & $j=3$ & $j=4$ & $j=5$ & $j=6$ \\
-\midrule
-$i=1$ & $0$ & $15750$ & $7875$ & $9375$ & $11875$ & $\mathbf{15125}$ \\
-$i=2$ & $-$ & $0$     & $2625$ & $4375$ & $7125$  & $10500$ \\
-$i=3$ & $-$ & $-$     & $0$    & $750$  & $2500$  & $5375$  \\
-$i=4$ & $-$ & $-$     & $-$    & $0$    & $1000$  & $3500$  \\
-$i=5$ & $-$ & $-$     & $-$    & $-$    & $0$     & $5000$  \\
-$i=6$ & $-$ & $-$     & $-$    & $-$    & $-$     & $0$     \\
-\bottomrule
+ & 1 & 2 & 3 & 4 & 5 & 6 \\
+\hline
+1 & 0 & 15750 & 7875 & 9375 & 11875 & 15125 \\
+2 & - & 0 & 2625 & 4375 & 7125 & 10500 \\
+3 & - & - & 0 & 750 & 2500 & 5375 \\
+4 & - & - & - & 0 & 1000 & 3500 \\
+5 & - & - & - & - & 0 & 5000 \\
+6 & - & - & - & - & - & 0 \\
 \end{tabular}
-\end{table}
-
-\begin{table}[H]
+\end{minipage}\hfill
+\begin{minipage}{0.45\textwidth}
 \centering
-\caption{Bảng $s$ — vị trí tách tối ưu.}
-\label{tab:s-clrs}
-\small
+\textbf{Bảng vị trí cắt}\\[2pt]
 \begin{tabular}{c|rrrrr}
+ & 2 & 3 & 4 & 5 & 6 \\
+\hline
+1 & 1 & 1 & 3 & 3 & 3 \\
+2 & - & 2 & 3 & 3 & 3 \\
+3 & - & - & 3 & 3 & 3 \\
+4 & - & - & - & 4 & 5 \\
+5 & - & - & - & - & 5 \\
+\end{tabular}
+\end{minipage}
+\end{table}
+
+\subsection{Truy vết dựng dấu ngoặc}
+\begin{VOutput}
+build_parens(split, 1, 6)           # doan A1..A6, 1-based
+  split[1][6] = 3 -> ( build(1,3) build(4,6) )
+    split[1][3] = 1 -> ( A1  ( A2 A3 ) )  = (A1(A2A3))
+    split[4][6] = 5 -> ( ( A4 A5 ) A6 )   = ((A4A5)A6)
+  -> ((A1(A2A3))((A4A5)A6))
+\end{VOutput}
+
+\textbf{Đáp số:} chi phí tối thiểu $\mathrm{cost}[1][6] = 15125$, dấu ngoặc tối ưu \texttt{((A1(A2A3))((A4A5)A6))}. Cả ba lời giải đều cho cùng con số 15125, và bộ kiểm thử đối chiếu thêm với liệt kê toàn bộ (mục~\ref{sec:testing}).
+
+% =========================================================
+\section{Phân tích độ phức tạp}
+\label{sec:complexity}
+% =========================================================
+
+\subsection{Thời gian và bộ nhớ của bản bottom-up}
+Ba vòng lặp lồng nhau theo $\ell$, $i$, $k$ cho tổng số phép tính
+\[
+\sum_{\ell=2}^{n} (n - \ell + 1)(\ell - 1) = \Theta(n^3).
+\]
+Hai bảng $\mathrm{cost}$ và $\mathrm{split}$ mỗi bảng $\Theta(n^2)$ ô, nên bộ nhớ phụ là $\Theta(n^2)$. Bản top-down có cùng $\Theta(n^3)$ thời gian và $\Theta(n^2)$ bộ nhớ vì cũng giải đúng $O(n^2)$ đoạn, mỗi đoạn quét $O(n)$ vị trí cắt.
+
+\subsection{Vì sao đệ quy thuần thất bại}
+Bản đệ quy thuần gọi lại cùng một đoạn rất nhiều lần. Đếm số lần gọi hàm cho thấy nó tăng theo cấp $3^{\,n-1}$, trong khi bản ghi nhớ chỉ tính mỗi đoạn đúng một lần (tổng $n(n+1)/2$ đoạn). Bảng dưới là số liệu đo trực tiếp bằng \texttt{bench\_naive.py}:
+
+\begin{table}[H]
+\centering
+\caption{Số lần gọi đệ quy: bản thuần so với bản ghi nhớ.}
+\small
+\begin{tabular}{c r r r}
 \toprule
-$i \backslash j$ & $j=2$ & $j=3$ & $j=4$ & $j=5$ & $j=6$ \\
+$n$ & Gọi (đệ quy thuần) & Tính (ghi nhớ) & Số Catalan $C_{n-1}$ \\
 \midrule
-$i=1$ & $1$ & $1$ & $3$ & $3$ & $\mathbf{3}$ \\
-$i=2$ & $-$ & $2$ & $3$ & $3$ & $3$ \\
-$i=3$ & $-$ & $-$ & $3$ & $3$ & $3$ \\
-$i=4$ & $-$ & $-$ & $-$ & $4$ & $5$ \\
-$i=5$ & $-$ & $-$ & $-$ & $-$ & $5$ \\
+5  & 81 & 15 & 14 \\
+8  & 2\,187 & 36 & 429 \\
+10 & 19\,683 & 55 & 4\,862 \\
+12 & 177\,147 & 78 & 58\,786 \\
+15 & 4\,782\,969 & 120 & 2\,674\,440 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-% =========================================================
-\section{Triển khai}
-% =========================================================
-
-\subsection{Lựa chọn công nghệ}
-\begin{itemize}
-  \item \textbf{Ngôn ngữ:} Python 3.10+ (chỉ thư viện chuẩn cho phần lõi). Cú pháp Python đọc gần với mã giả, thuận tiện cho mục đích giảng dạy.
-  \item \textbf{Quy ước chỉ số:} \emph{1-based padding} — bảng $m, s$ kích thước $(n+1) \times (n+1)$, ô index $0$ không dùng. Nhờ vậy code Python truy cập \texttt{m[i][j]}, \texttt{s[i][j]} \emph{mirror đúng từng dòng} mã giả CLRS, tránh phải dịch \texttt{[i-1]} ở mọi nơi.
-  \item \textbf{Sentinel cho $\infty$:} \texttt{math.inf} (Python) trong vòng so sánh, sau khi vòng $k$ kết thúc giá trị chắc chắn là số nguyên do tồn tại ít nhất một $q < +\infty$.
-  \item \textbf{Test framework:} \texttt{pytest} (dev-dependency duy nhất). Property-based test viết thuần bằng \texttt{random.Random(seed)} cố định để đảm bảo tái lập mà không phụ thuộc \texttt{hypothesis}.
-\end{itemize}
-
-\subsection{Cấu trúc dự án}
-\begin{lstlisting}[language=,basicstyle=\ttfamily\small,frame=single,backgroundcolor=\color{codebg}]
-matrix-chain/
-├── src/mcm/
-│   ├── __init__.py       # re-export public API
-│   ├── solver.py         # MATRIX-CHAIN-ORDER, PRINT-OPTIMAL-PARENS, MCMSolver
-│   ├── validator.py      # validate_dimension_array
-│   ├── formatter.py      # DisplayMode, format_table, format_trace
-│   ├── cli.py            # entry point CLI (argparse)
-│   └── __main__.py       # python -m mcm
-├── tests/
-│   ├── test_validator.py # 12 tests
-│   ├── test_solver.py    # 16 tests + brute-force cross-check + perf
-│   ├── test_formatter.py # 12 tests
-│   └── test_cli.py       # 3 smoke tests
-├── templates/index.html  # giao diện web (UI demo)
-├── static/style.css      # CSS cho UI
-├── web_app.py            # Flask app
-├── pyproject.toml
-└── README.md
-\end{lstlisting}
-
-\subsection{Module \texttt{validator}}
-Hàm \texttt{validate\_dimension\_array(p) -> int} kiểm tra ba điều kiện theo thứ tự: độ dài $\ge 2$, kiểu \texttt{int} (loại trừ \texttt{bool} — vốn là subclass của \texttt{int} trong Python), và giá trị dương. Khi hợp lệ, trả về $n = \texttt{len}(p) - 1$.
-
-Thông điệp lỗi tiếng Việt được giữ \emph{nguyên văn} theo yêu cầu trong tài liệu môn học, ví dụ: ``\texttt{Mọi phần tử của Dimension\_Array phải là số nguyên dương}''.
-
-\subsection{Module \texttt{solver} — phần lõi}
-
-\begin{lstlisting}[caption={\texttt{matrix\_chain\_order} — bám đúng từng dòng mã giả CLRS.},label={lst:mco}]
-import math
-
-def matrix_chain_order(p):
-    n = len(p) - 1                                    # dòng 1
-    m = [[0] * (n + 1) for _ in range(n + 1)]         # dòng 2 (1-based padding)
-    s = [[0] * (n + 1) for _ in range(n + 1)]
-    for i in range(1, n + 1):                         # dòng 3-4
-        m[i][i] = 0
-
-    for length in range(2, n + 1):                    # dòng 5: l = 2..n
-        for i in range(1, n - length + 2):            # dòng 6
-            j = i + length - 1                        # dòng 7
-            m[i][j] = math.inf                        # dòng 8
-            for k in range(i, j):                     # dòng 9
-                q = m[i][k] + m[k+1][j] + p[i-1]*p[k]*p[j]   # dòng 10
-                if q < m[i][j]:                       # dòng 11
-                    m[i][j] = q                       # dòng 12
-                    s[i][j] = k                       # dòng 13
-    return m, s
-\end{lstlisting}
-
-Hàm \texttt{print\_optimal\_parens(s, i, j)} dùng \texttt{StringIO} làm accumulator để giữ cấu trúc đệ quy ``in \texttt{`(`}, gọi đệ quy, in \texttt{`)`}'' giống mã giả, đồng thời trả về kiểu \texttt{str} để dễ unit-test.
-
-Lớp \texttt{MCMSolver} đóng vai trò \emph{facade}, gói validator $\to$ solver $\to$ print parens $\to$ tự kiểm tra nhất quán nội bộ trong một call duy nhất. Sau khi giải xong, mọi truy vấn (\texttt{cost}, \texttt{parens}, \texttt{m}, \texttt{s}, \texttt{trace}) đều có thể lấy nhanh.
-
-\subsection{Module \texttt{formatter}}
-\begin{itemize}
-  \item Enum \texttt{DisplayMode} với ba giá trị: \texttt{NONE} / \texttt{PARTIAL\_TABLES} / \texttt{FULL\_TABLES}.
-  \item \texttt{format\_table} căn lề phải, ô không dùng (ô $i > j$ với bảng $m$, ô $i \ge j$ với bảng $s$) hiển thị dấu \texttt{`-`}. Độ rộng cột thống nhất bằng $\max\{\texttt{len(str(value))}\} + 2$.
-  \item \texttt{format\_trace} ghép bảng + dòng kết quả thành một \emph{Trace\_Output} với bốn nhãn tiếng Việt nguyên văn.
-\end{itemize}
-
-\subsection{Module \texttt{cli}}
-Sử dụng \texttt{argparse}: positional \texttt{dims} (đọc từ \texttt{stdin} nếu rỗng), tham số \texttt{--mode} (\{\texttt{none, partial, full}\}, mặc định \texttt{full}) và \texttt{--table} (\{\texttt{m, s}\}, áp dụng khi \texttt{--mode=partial}).
-
-Quy ước mã thoát: $0$ thành công, $1$ \texttt{ValueError} (input sai), $2$ \texttt{RuntimeError} hoặc lỗi khác (ví dụ vi phạm tính nhất quán nội bộ). Khi $n > 500$, CLI gọi \texttt{sys.setrecursionlimit} trước khi truy vết bảng $s$ để tránh tràn stack.
-
-% =========================================================
-\section{Kiểm thử và đảm bảo chất lượng}
-% =========================================================
-
-\subsection{Tổng quan}
-Bộ test có \textbf{43 test case} chia thành 4 nhóm: \texttt{validator}, \texttt{solver}, \texttt{formatter}, \texttt{cli}. Toàn bộ 43 test \emph{pass} trong $\approx 0.30$ giây.
-
-\subsection{Property-Based Testing (PBT)}
-Property-Based Testing là kỹ thuật kiểm thử bằng cách phát biểu các \emph{tính chất bất biến} mà chương trình phải thoả mãn với \emph{mọi} đầu vào hợp lệ, sau đó kiểm tra bằng cách sinh ngẫu nhiên một số lượng lớn input. Do yêu cầu chỉ dùng thư viện chuẩn, ở đây tôi không dùng \texttt{hypothesis} mà dùng \texttt{random.Random(SEED)} cố định, mỗi property một offset trên seed cơ sở $20251128$ để \emph{tái lập} 100\%.
-
-Bảng~\ref{tab:pbt} liệt kê 11 property đã được kiểm.
-
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\caption{11 property-based test với cross-check brute-force.}
-\label{tab:pbt}
-\renewcommand{\arraystretch}{1.18}
-\small
-\begin{tabularx}{\linewidth}{c >{\raggedright\arraybackslash}X c}
-\toprule
-\textbf{\#} & \textbf{Phát biểu tính chất} & \textbf{$n_{\max}$} \\
-\midrule
-1  & Validator trả về $\texttt{len}(p) - 1$                                          & 8 \\
-2  & Validator từ chối phần tử $\le 0$                                                & 8 \\
-3  & $m[i][i] = 0$ với mọi $i$ (đường chéo)                                            & 8 \\
-4  & Tự nhất quán: $s[i][j] \in [i, j-1]$, recurrence cực tiểu, $m[i][j]$ là min       & 8 \\
-5  & \textbf{Cross-check brute-force:} $m[1][n]$ khớp min trên \emph{mọi} parenthesize  & 6 \\
-6  & API \texttt{cost} khớp $m[1][n]$                                                  & 8 \\
-7  & Cấu trúc parens hợp lệ (ngoặc cân bằng, token $A_k$ thứ tự đúng)                  & 8 \\
-8  & Ô không sử dụng trong bảng hiển thị \texttt{`-`}                                  & 8 \\
-9  & Cột bảng căn lề nhất quán                                                         & 8 \\
-10 & Trace\_Output \texttt{FULL\_TABLES} chứa đủ 4 nhãn tiếng Việt                     & 8 \\
-11 & Cost in dạng số nguyên thuần (regex \texttt{\textbackslash d+})                   & 8 \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\begin{tikzpicture}
+\begin{semilogyaxis}[
+    width=12cm, height=6.5cm,
+    xlabel={$n$ (số ma trận)},
+    ylabel={Số phép (log)},
+    legend pos=north west,
+    grid=both, grid style={gray!20},
+    xtick={5,7,9,11,13,15},
+]
+\addplot[mark=*, thick, red] coordinates {
+  (5,81)(7,729)(9,6561)(11,59049)(13,531441)(15,4782969)
+};
+\addplot[mark=square*, thick, blue] coordinates {
+  (5,15)(7,28)(9,45)(11,66)(13,91)(15,120)
+};
+\legend{Đệ quy thuần (mũ), Ghi nhớ ($n(n{+}1)/2$)}
+\end{semilogyaxis}
+\end{tikzpicture}
+\caption{Trục tung thang log: bản thuần tăng theo hàm mũ, bản ghi nhớ tăng theo đa thức.}
+\end{figure}
 
-Mỗi property test chạy 100 iteration, tổng cộng $\approx 1100$ test case sinh tự động. Property~5 đặc biệt quan trọng: nó so sánh $m[1][n]$ của thuật toán quy hoạch động với chi phí tối thiểu khi liệt kê \emph{toàn bộ} parenthesization (số Catalan $C_{n-1}$), do đó cross-check tính \emph{tối ưu Bellman} của bảng $m$.
+Chính sự bùng nổ này là động lực của quy hoạch động: lưu lại kết quả đoạn con để dùng lại, đổi bộ nhớ $\Theta(n^2)$ lấy thời gian từ cấp mũ xuống $\Theta(n^3)$.
 
-\subsection{Unit test 4 ví dụ bắt buộc}
+% =========================================================
+\section{Cài đặt và thiết kế thử nghiệm}
+\label{sec:testing}
+% =========================================================
 
-\begin{table}[H]
-\centering
-\caption{Bốn ví dụ bắt buộc theo tài liệu môn học.}
-\small
-\begin{tabular}{l c c}
-\toprule
-\textbf{Dimension Array $p$} & $\boldsymbol{m[1, n]}$ & \textbf{Optimal Parens} \\
-\midrule
-$[3, 10, 7, 2]$               & $200$    & $(A_1(A_2A_3))$ \\
-$[10, 20, 50, 1, 100]$        & $2200$   & $((A_1(A_2A_3))A_4)$ \\
-$[30, 35, 15, 5, 10, 20, 25]$ & $15125$  & $((A_1(A_2A_3))((A_4A_5)A_6))$ \\
-$[5, 7]$                      & $0$      & $A_1$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Tổ chức mã nguồn}
+Phần lõi chỉ dùng thư viện chuẩn Python, chạy trên Python 3.10 trở lên. Toàn bộ hàm tính toán là hàm thuần (không in, không đọc ghi tệp); chỉ \texttt{cli.py} đụng tới vào/ra. Nhờ tách bạch như vậy, mỗi hàm có thể gọi trực tiếp trong test và so sánh giá trị trả về, không cần bắt chuỗi in ra màn hình.
 
-\subsection{Test hiệu năng}
+\subsection{Hai lớp kiểm thử}
+Hệ thống có hai lớp kiểm thử bổ trợ nhau.
+
+\paragraph{(a) Bộ testcase tường minh} nằm trong \texttt{testcases/}, gồm tệp dữ liệu \texttt{cases.json} và trình chấm \texttt{run\_testcases.py}. Dữ liệu chia hai nhóm:
 \begin{itemize}
-  \item Với $n = 100$: hoàn thành trong $\approx 0.05$ giây trên máy tham chiếu (yêu cầu giáo trình $< 1\,\text{s}$).
-  \item Với $n = 150$: $\approx 0.18$ giây — không reject đầu vào hợp lệ (graceful degradation).
+  \item \emph{Nhóm hợp lệ} (12 ca): mỗi ca ghi mảng kích thước, chi phí kỳ vọng và dấu ngoặc kỳ vọng. Bốn ca đầu lấy từ ví dụ trong tài liệu và CLRS; tám ca còn lại thiết kế để phủ nhiều dạng cấu trúc: chuỗi hai ma trận (chỉ một cách nhân), trường hợp thứ tự ngoặc đổi chi phí gấp mười lần, kích thước tăng dần, giảm dần, bằng nhau, dao động mạnh, và hỗn hợp không quy luật.
+  \item \emph{Nhóm sai} (5 ca): phủ ba nhánh kiểm tra dữ liệu - mảng quá ngắn, phần tử không dương, phần tử không phải số nguyên - và đối chiếu thông điệp lỗi trùng khớp từng ký tự.
+\end{itemize}
+
+\paragraph{(b) Bộ kiểm thử tự động} nằm trong \texttt{tests/}, chạy bằng \texttt{pytest}. Gồm test ví dụ cụ thể, test thông điệp lỗi, và một số test \emph{dựa trên tính chất} (property-based). Vì yêu cầu chỉ dùng thư viện chuẩn nên thay cho thư viện sinh dữ liệu chuyên dụng, các test tính chất dùng \texttt{random.Random(seed)} với seed cố định, mỗi test sinh từ 150 đến 200 mẫu ngẫu nhiên và có thể tái lập nhờ seed.
+
+\subsection{Cách xây dựng giá trị kỳ vọng}
+Đây là điểm cần cẩn thận: nếu \enquote{đáp án mẫu} tự đặt cũng sai thì test vô nghĩa. Vì vậy mọi chi phí kỳ vọng của ca tự thiết kế đều được đối chiếu độc lập bằng lời giải đệ quy thuần (\texttt{naive\_min\_cost}) - thuật toán này liệt kê toàn bộ cách đặt ngoặc nên chắc chắn cho cực tiểu thật. Với các ca có nhiều lời giải cùng chi phí (ví dụ ca mọi kích thước bằng nhau), dấu ngoặc kỳ vọng được ghi đúng theo dấu ngoặc mà bản bottom-up chọn, để test không phụ thuộc vào việc \enquote{đoán} một trong nhiều đáp án tối ưu.
+
+\subsection{Cách đánh giá đúng/sai}
+\begin{itemize}
+  \item Ca hợp lệ: đúng khi \emph{cả} chi phí lẫn dấu ngoặc khớp giá trị kỳ vọng.
+  \item Ca sai: đúng khi chương trình ném ngoại lệ \texttt{DimensionError} với thông điệp trùng khớp nguyên văn.
+  \item Test tính chất \enquote{tối ưu thực sự}: so chi phí của bottom-up và top-down với chi phí liệt kê toàn bộ; đây là kiểm chứng mạnh nhất vì xác nhận lời giải đạt cực tiểu toàn cục, không chỉ tự nhất quán.
+  \item Test tính chất \enquote{dấu ngoặc hợp lệ}: kiểm tra ngoặc cân bằng ở mọi tiền tố và các tên $A_1, \ldots, A_n$ xuất hiện đúng thứ tự.
+\end{itemize}
+
+\subsection{Quy mô thử nghiệm}
+\begin{itemize}
+  \item Bộ testcase tường minh: 17 ca (12 hợp lệ + 5 sai).
+  \item Bộ pytest: 42 test. Trong đó các test tính chất sinh ngẫu nhiên cộng dồn khoảng 1000 mẫu. Riêng test đối chiếu liệt kê toàn bộ chạy với $n \le 6$ (mỗi mẫu so tới $C_5 = 42$ cách đặt ngoặc).
+  \item Ba lời giải được kiểm tra cho ra cùng kết quả trên mọi ví dụ bắt buộc.
 \end{itemize}
 
 % =========================================================
-\section{Giao diện web demo}
+\section{Kết quả thử nghiệm và đánh giá}
 % =========================================================
 
-\subsection{Kiến trúc tổng thể}
-Ứng dụng web demo viết bằng \textbf{Flask}, sử dụng kiến trúc đơn giản:
-\begin{itemize}
-  \item \texttt{web\_app.py}: Flask server với 2 endpoint.
-    \begin{itemize}[noitemsep]
-      \item \texttt{GET /}: render template \texttt{index.html}.
-      \item \texttt{POST /api/solve}: nhận JSON \texttt{\{dims: [...]\}}, gọi \texttt{MCMSolver}, trả về JSON gồm \texttt{cost}, \texttt{parens}, bảng $m$, bảng $s$, và danh sách các bước tính toán.
-    \end{itemize}
-  \item \texttt{templates/index.html}: giao diện chính (HTML + Vanilla JS, không dùng framework JS).
-  \item \texttt{static/style.css}: thiết kế responsive, palette màu xanh navy + accent vàng cho ô tối ưu.
-\end{itemize}
-
-\subsection{Tính năng giao diện}
-\begin{enumerate}
-  \item \textbf{Nhập Dimension Array} dưới dạng văn bản (hỗ trợ phân cách bằng dấu phẩy hoặc khoảng trắng), kèm 4 ví dụ mẫu bấm nhanh.
-  \item \textbf{Tab \emph{Bảng $m$ \& $s$}:} hiển thị hai bảng đầy đủ, ô tối ưu $m[1, n]$ tô vàng, ô không dùng để dấu \texttt{`-`}.
-  \item \textbf{Tab \emph{Các bước}:} accordion từng bước theo độ dài chuỗi con $\ell$, cho từng cặp $(i, j)$ liệt kê \emph{mọi} candidate $k$ với công thức đầy đủ và đánh dấu candidate tối ưu. Có nút \emph{Trước / Sau / Tự động} để xem từng bước, đồng thời ô đang tính được highlight trên bảng.
-  \item \textbf{Tab \emph{Cây đóng ngoặc}:} render cây phân tách theo bảng $s$, giúp sinh viên hình dung trực quan thứ tự nhân ma trận. Bên dưới là phần \emph{truy vết} dạng văn bản (textual trace).
-\end{enumerate}
-
-\subsection{Mẫu kết quả}
-Với input $p = [30, 35, 15, 5, 10, 20, 25]$, giao diện hiển thị:
-\begin{itemize}
-  \item Chi phí tối thiểu: \textbf{15{,}125} (tô vàng đậm).
-  \item Đóng ngoặc tối ưu: \texttt{((A1(A2A3))((A4A5)A6))}.
-  \item 16 bước tính toán (1 bước khởi tạo + 15 cặp $(i, j)$ với $i < j$).
-  \item Cây phân tách 3 tầng theo $s[1, 6] = 3$, $s[1, 3] = 1$, $s[4, 6] = 5$.
-\end{itemize}
-
-\subsection{Cách chạy}
-\begin{lstlisting}[language=,basicstyle=\ttfamily\small,frame=single,backgroundcolor=\color{codebg}]
-# Lần đầu: tạo và kích hoạt môi trường ảo
-python -m venv venv
-.\venv\Scripts\activate   (Windows) hoặc source venv/bin/activate (Linux/macOS)
-
-# Cài đặt
-pip install -e ".[dev]" flask
-
-# Chạy
-python web_app.py
-# Mở http://127.0.0.1:5000 trên trình duyệt
-\end{lstlisting}
-
-% =========================================================
-\section{Kết quả thực nghiệm}
-% =========================================================
+\subsection{Kết quả kiểm thử}
+Toàn bộ 42 test pytest đều PASS (đo trên Python 3.13, khoảng $0{,}2$ giây). Bộ testcase tường minh đạt $17/17$ PASS. Kết quả dòng lệnh trùng khớp với bảng tham chiếu trong tài liệu.
 
 \subsection{Đầu ra mẫu của CLI}
-Lệnh \texttt{python -m mcm 30 35 15 5 10 20 25 --mode=full} cho output:
+Lệnh \texttt{python -m mcm2 30 35 15 5 10 20 25} cho:
 
-\begin{lstlisting}[language=,basicstyle=\ttfamily\footnotesize,frame=single,backgroundcolor=\color{codebg}]
-Bảng m:
-            j=1     j=2     j=3     j=4     j=5     j=6
-    i=1       0   15750    7875    9375   11875   15125
-    i=2       -       0    2625    4375    7125   10500
-    i=3       -       -       0     750    2500    5375
-    i=4       -       -       -       0    1000    3500
-    i=5       -       -       -       -       0    5000
-    i=6       -       -       -       -       -       0
-Bảng s:
-        j=2   j=3   j=4   j=5   j=6
-  i=1     1     1     3     3     3
-  i=2     -     2     3     3     3
-  i=3     -     -     3     3     3
-  i=4     -     -     -     4     5
-  i=5     -     -     -     -     5
-Cách đóng mở ngoặc tối ưu: ((A1(A2A3))((A4A5)A6))
+\begin{VOutput}
+Bảng chi phí (số phép nhân tối thiểu của từng đoạn):
+              1       2       3       4       5       6
+      1       0   15750    7875    9375   11875   15125
+      2       -       0    2625    4375    7125   10500
+      3       -       -       0     750    2500    5375
+      4       -       -       -       0    1000    3500
+      5       -       -       -       -       0    5000
+      6       -       -       -       -       -       0
+Bảng vị trí cắt tối ưu:
+      1   2   3   4   5   6
+  1   -   1   1   3   3   3
+  2   -   -   2   3   3   3
+  3   -   -   -   3   3   3
+  4   -   -   -   -   4   5
+  5   -   -   -   -   -   5
+  6   -   -   -   -   -   -
+Dấu ngoặc tối ưu: ((A1(A2A3))((A4A5)A6))
 Số phép nhân vô hướng tối thiểu: 15125
-\end{lstlisting}
+\end{VOutput}
 
-\subsection{Đối chiếu với CLRS}
-Cả hai bảng và biểu thức ngoặc đều khớp \emph{tuyệt đối} với Hình 15.5 của CLRS chương 15.2 \cite{clrs}.
+\subsection{Đánh giá hiệu năng}
+Bảng và biểu đồ dưới đo thời gian chạy của bottom-up theo $n$ (lấy giá trị nhỏ nhất qua 5 lần chạy, dữ liệu sinh từ seed cố định, đo bằng \texttt{benchmark.py}):
+
+\begin{table}[H]
+\centering
+\caption{Thời gian thực thi bottom-up theo kích thước $n$.}
+\small
+\begin{tabular}{c r l}
+\toprule
+$n$ & Thời gian & Ghi chú \\
+\midrule
+50  & $\approx 2{,}3$ ms & \\
+100 & $\approx 19$ ms & gấp đôi $n$ so với 50: tăng $\approx 8{,}3$ lần \\
+150 & $\approx 66$ ms & \\
+200 & $\approx 150$ ms & \\
+300 & $\approx 547$ ms & \\
+400 & $\approx 1542$ ms & gấp đôi $n$ so với 200: tăng $\approx 8{,}3$ lần \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=12cm, height=6.5cm,
+    xlabel={$n$ (số ma trận)},
+    ylabel={Thời gian (ms)},
+    legend pos=north west,
+    grid=both, grid style={gray!20},
+    xmax=420,
+]
+\addplot[mark=*, thick, primary] coordinates {
+  (50,2.33)(100,19.31)(150,65.76)(200,149.67)(300,546.84)(400,1541.86)
+};
+\addlegendentry{Đo thực tế}
+% Duong tham chieu c*n^3 voi c chuan hoa tai n=100.
+\addplot[dashed, thick, red, domain=50:400, samples=40] {19.31*(x/100)^3};
+\addlegendentry{Tham chiếu $c\,n^3$}
+\end{axis}
+\end{tikzpicture}
+\caption{Thời gian đo bám sát đường tham chiếu $\Theta(n^3)$.}
+\end{figure}
+
+Khi $n$ tăng từ 50 lên 100, thời gian tăng khoảng $8{,}3$ lần - gần với dự đoán lý thuyết $2^3 = 8$ lần của $\Theta(n^3)$. Với $n > 100$, chương trình vẫn chạy đúng và trả kết quả mà không đặt giới hạn cứng; phần truy vết đệ quy nâng giới hạn đệ quy khi $n$ rất lớn để tránh tràn ngăn xếp.
+
+% =========================================================
+\section{Mô tả chức năng và cách thao tác}
+% =========================================================
+
+\subsection{Giao diện dòng lệnh}
+\textbf{Cách nhập:} truyền mảng kích thước qua tham số dòng lệnh hoặc qua \texttt{stdin}.
+\begin{VOutput}
+python -m mcm2 30 35 15 5 10 20 25                  # in ca hai bang
+python -m mcm2 30 35 15 5 10 20 25 --tables=cost    # chi bang chi phi
+python -m mcm2 30 35 15 5 10 20 25 --tables=split   # chi bang vi tri cat
+python -m mcm2 30 35 15 5 10 20 25 --tables=none    # chi ket qua
+echo 30 35 15 5 10 20 25 | python -m mcm2           # nhap qua stdin
+\end{VOutput}
+\textbf{Các output trả về:} tuỳ cờ \texttt{-{}-tables}, chương trình in bảng chi phí, bảng vị trí cắt (ô không dùng để dấu \texttt{-}, các cột canh thẳng hàng), dấu ngoặc tối ưu, và số phép nhân vô hướng tối thiểu. Khi dữ liệu sai, chương trình in thông điệp lỗi tiếng Việt ra \texttt{stderr} và trả mã thoát khác 0 (1 cho lỗi dữ liệu, 2 cho lỗi nội bộ).
+
+\subsection{Giao diện web demo}
+Ứng dụng web (\texttt{web\_app.py}, dùng Flask) có một endpoint \texttt{GET /} trả trang chính, và một endpoint \texttt{POST /api/solve} nhận JSON \texttt{\{dims: [...]\}}, giải bằng bottom-up rồi trả về: số ma trận, chi phí tối thiểu, dấu ngoặc, số cách đặt ngoặc (Catalan), bảng chi phí, bảng vị trí cắt, và danh sách các bước lấp bảng.
+
+\paragraph{Cách nhập dữ liệu.} Phần phức tạp nhất với người mới là hiểu mảng $p$: nó không phải kích thước của từng ma trận mà là \emph{chuỗi các mốc kích thước nối tiếp}, trong đó số cột của một ma trận đồng thời là số hàng của ma trận sau. Để gỡ rào cản này, giao diện không bắt người dùng gõ thẳng mảng phẳng mà cung cấp một \emph{bộ dựng theo từng ma trận}:
+\begin{itemize}
+  \item Mỗi ma trận là một dòng \texttt{Ai: [hàng] $\times$ [cột]}. Người dùng thêm/bớt ma trận bằng nút $+$ / $-$.
+  \item Ô \emph{số hàng} của mọi ma trận (trừ ma trận đầu) bị khoá và \textbf{tô đỏ}, tự động lấy bằng số cột của ma trận liền trước. Nhờ vậy ràng buộc \enquote{cột trước = hàng sau} luôn được giữ và không thể nhập chuỗi không hợp lệ.
+  \item Phần xem trước hiển thị song song \enquote{Chuỗi ma trận} (ví dụ \texttt{A1(30$\times$35) $\cdot$ A2(35$\times$15) $\cdots$}) và \enquote{Mảng kích thước $p$} tương ứng, để người dùng thấy rõ mối liên hệ giữa hai cách biểu diễn.
+  \item Một khối giải thích thu gọn (bấm để mở) trình bày quy tắc $A_i = p[i{-}1] \times p[i]$ kèm sơ đồ minh hoạ mỗi ma trận trải dưới hai mốc kích thước liền kề (Hình~\ref{fig:brace}).
+  \item Mục \enquote{nhập nhanh} cho người dùng thành thạo dán thẳng mảng $p$ phẳng; hệ thống tự tách thành các ma trận tương ứng.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tabular}{@{}l@{}}
+\ttfamily\small p:\ \ 30\ \ \ 35\ \ \ 15\ \ \ 5\ \ \ 10\ \ \ 20\ \ \ 25 \\
+\ttfamily\small \phantom{p:\ \ }\textcolor{primary}{\textbar\_A1\_\textbar} \\
+\ttfamily\small \phantom{p:\ \ 30\ \ \ }\textcolor{primary}{\textbar\_A2\_\textbar} \\
+\ttfamily\small \phantom{p:\ \ 30\ \ \ 35\ \ }\textcolor{primary}{\textbar A3\textbar} \\
+\ttfamily\small \phantom{p:\ \ 30\ \ \ 35\ \ \ 15\ }\textcolor{primary}{\textbar A4\textbar} \\
+\ttfamily\small \phantom{p:\ \ 30\ \ \ 35\ \ \ 15\ \ \ 5\ }\textcolor{primary}{\textbar\_A5\_\textbar} \\
+\ttfamily\small \phantom{p:\ \ 30\ \ \ 35\ \ \ 15\ \ \ 5\ \ \ 10\ }\textcolor{primary}{\textbar\_A6\_\textbar} \\
+\end{tabular}
+\caption{Sơ đồ trong khối giải thích: mỗi ma trận $A_i$ nằm giữa hai mốc kích thước $p[i{-}1]$ và $p[i]$; con số $35$ vừa là cột của $A_1$ vừa là hàng của $A_2$ nên chỉ ghi một lần.}
+\label{fig:brace}
+\end{figure}
+
+\paragraph{Các tab kết quả.} Giao diện (HTML và JavaScript thuần) chia ba tab:
+\begin{enumerate}
+  \item \textbf{Bảng chi phí \& cắt:} hai bảng đầy đủ; ô đáp số $\mathrm{cost}[1][n]$ tô nổi bật, ô không dùng để dấu \texttt{-}.
+  \item \textbf{Các bước lấp bảng:} mỗi bước ứng với một đoạn $(i, j)$, liệt kê mọi vị trí cắt $k$ kèm công thức đầy đủ và đánh dấu lựa chọn tối ưu. Có nút \emph{Trước / Sau} để duyệt; ô đang tính được tô sáng trên bảng chi phí.
+  \item \textbf{Cây dấu ngoặc:} dựng biểu thức dấu ngoặc tối ưu từ bảng vị trí cắt.
+\end{enumerate}
+
+\textbf{Cách chạy web demo:}
+\begin{VOutput}
+# 1. Tao moi truong ao (khuyen nghi)
+python -m venv venv
+venv\Scripts\activate
+
+# 2. Cai Flask
+pip install flask
+
+# 3. Chay server, mo trinh duyet vao dia chi in ra
+python web_app.py              # mac dinh http://127.0.0.1:5001
+\end{VOutput}
+
+Với dữ liệu mẫu $p = [30, 35, 15, 5, 10, 20, 25]$, giao diện hiển thị chi phí $15125$, dấu ngoặc \texttt{((A1(A2A3))((A4A5)A6))}, số cách đặt ngoặc $42$, và 15 bước lấp bảng.
+
+% =========================================================
+\section{So sánh với công cụ AI}
+% =========================================================
+
+Để đánh giá độ tin cậy, nhóm thử cho một trợ lý AI (ChatGPT) giải cùng các ví dụ và so với hệ thống.
+\begin{itemize}
+  \item \textbf{Với ví dụ kinh điển} $p = [30, 35, 15, 5, 10, 20, 25]$: AI cho đúng đáp số $15125$ và dấu ngoặc tối ưu, kèm giải thích công thức truy hồi. Ví dụ này phổ biến trong tài liệu nên AI trả lời chính xác và đáng tin trong trường hợp này.
+  \item \textbf{Với dữ liệu lạ} (ví dụ $p = [13, 5, 89, 3, 34]$, đáp số đúng là $2856$): AI thường ra đúng chi phí nhưng không phải lúc nào cũng kèm bảng chi phí và bảng vị trí cắt đầy đủ, đôi khi bước trung gian trình bày thiếu nhất quán. Người dùng khó kiểm chứng nếu không tự tính lại, và AI không tự chạy lại để xác nhận.
+  \item \textbf{Ưu thế của hệ thống:} (i) kết quả \emph{tất định, tái lập được} - cùng dữ liệu luôn cho cùng kết quả; (ii) có \emph{kiểm tra chéo nội bộ}, từ chối in ra kết quả không nhất quán; (iii) có \emph{ba lời giải} đối chiếu lẫn nhau cùng bộ testcase và liệt kê toàn bộ làm đối chứng minh bạch; (iv) \emph{hiển thị từng bước} candidate và cây dấu ngoặc, phục vụ mục tiêu học tập.
+\end{itemize}
+Tóm lại, AI tiện để giải nhanh ví dụ phổ biến, nhưng với yêu cầu chính xác, kiểm chứng được và minh hoạ từng bước thì một cài đặt thuật toán tường minh như hệ thống này đáng tin cậy hơn. Cách kiểm chứng an toàn là dùng kết quả của AI như một gợi ý rồi đối chiếu lại bằng chương trình.
 
 % =========================================================
 \section{Kết luận}
 % =========================================================
 
 \subsection{Kết quả đạt được}
-Báo cáo đã trình bày trọn vẹn quá trình giải bài toán Matrix Chain Multiplication: từ phát biểu hình thức, công thức truy hồi, mã giả, đến triển khai bằng Python bám sát từng dòng mã giả CLRS. Hệ thống có:
-\begin{itemize}
-  \item Bốn module Python tổ chức rõ ràng (validator, solver, formatter, cli).
-  \item Bộ kiểm thử 43 test case (gồm 11 property-based test với cross-check brute-force liệt kê toàn bộ Catalan parenthesization).
-  \item Giao diện CLI với ba chế độ hiển thị bảng (\texttt{none}, \texttt{partial}, \texttt{full}).
-  \item Giao diện web demo (Flask) trực quan với ba tab: bảng, các bước, cây phân tách.
-\end{itemize}
+Báo cáo trình bày trọn vẹn quá trình giải bài toán Matrix Chain Multiplication: từ trực giác \enquote{thứ tự nhân quyết định chi phí}, cấu trúc con tối ưu, công thức truy hồi, mã giả, đến cài đặt Python. Hệ thống có ba lời giải (đệ quy thuần, đệ quy ghi nhớ, lấp bảng từ dưới lên) đối chiếu lẫn nhau, một bộ testcase tường minh 17 ca, một bộ pytest 42 test, một giao diện dòng lệnh và một giao diện web minh hoạ từng bước.
 
 \subsection{Hạn chế}
 \begin{itemize}
-  \item Mới triển khai phiên bản Bottom-Up; chưa làm phiên bản top-down memoized để so sánh.
-  \item Cây phân tách chỉ render dạng cây HTML thuần, chưa có animation từng bước trên bảng.
-  \item Web app dùng Flask development server, chưa đóng gói WSGI server cho deployment thật.
+  \item Chỉ tính chi phí và thứ tự đặt ngoặc, chưa thực hiện phép nhân ma trận thật.
+  \item Web demo dùng máy chủ phát triển của Flask, chưa cấu hình máy chủ cho triển khai thực tế.
+  \item Chưa cài thuật toán dưới bậc ba (ví dụ Hu-Shing $O(n \log n)$); ràng buộc này có chủ ý để bám sát phương pháp giảng dạy.
 \end{itemize}
 
 \subsection{Hướng mở rộng}
 \begin{itemize}
-  \item Thêm phiên bản top-down (memoization) và đo benchmark so với Bottom-Up.
-  \item Tích hợp thuật toán Hu--Shing $O(n \log n)$ làm tham chiếu nâng cao cho sinh viên hứng thú.
-  \item Triển khai cây phân tách dạng SVG có animation, đồng bộ với từng bước trên bảng $m$.
-  \item Triển khai phép nhân ma trận thực tế (không chỉ tính chi phí) để minh hoạ end-to-end.
+  \item Thêm hoạt cảnh đồng bộ giữa từng bước và ô tương ứng trên bảng.
+  \item Cho phép xuất các bước ra tệp để chấm tự động.
+  \item Bổ sung phép nhân ma trận thật để minh hoạ trọn vẹn từ đầu đến cuối.
 \end{itemize}
 
 % =========================================================
@@ -605,28 +714,24 @@ Báo cáo đã trình bày trọn vẹn quá trình giải bài toán Matrix Cha
 
 \bibitem{clrs}
 T. H. Cormen, C. E. Leiserson, R. L. Rivest, and C. Stein.
-\newblock \emph{Introduction to Algorithms}, 4th edition.
-\newblock MIT Press, 2022.
+\newblock \emph{Introduction to Algorithms}, Third Edition.
+\newblock The MIT Press, 2009.
+\newblock ISBN 978-0-262-03384-8.
+\newblock (Chương 15: Dynamic Programming, mục 15.2: Matrix-chain multiplication,
+    trang 370--378.)
+
+\bibitem{dpv}
+S. Dasgupta, C. H. Papadimitriou, and U. V. Vazirani.
+\newblock \emph{Algorithms}.
+\newblock Bản thảo, 2006. \url{http://algorithmics.lsi.upc.edu/docs/Dasgupta-Papadimitriou-Vazirani.pdf}
+\newblock (Chương 6: Dynamic Programming, mục 6.5: Chain matrix multiplication.)
 
 \bibitem{slide}
 Huỳnh Thị Thanh Thương.
-\newblock \emph{Slide bài giảng môn ``Phân tích và Thiết kế Thuật toán''}.
-\newblock Trường Đại học Công nghệ Thông tin (UIT), 2024--2025.
-
-\bibitem{python}
-Python Software Foundation.
-\newblock \emph{Python 3.10 Documentation}.
-\newblock \url{https://docs.python.org/3.10/}.
-
-\bibitem{flask}
-Pallets Projects.
-\newblock \emph{Flask Documentation}.
-\newblock \url{https://flask.palletsprojects.com/}.
-
-\bibitem{pbt}
-J. Hughes.
-\newblock QuickCheck: Property-based testing for Haskell.
-\newblock In \emph{ICFP}, 2000.
+\newblock \emph{Bài giảng 16: Thiết kế thuật toán -- Kỹ thuật Quy hoạch động},
+    môn Phân tích và Thiết kế Thuật toán (CS112), mã học phần C3T13.
+\newblock Trường Đại học Công nghệ Thông tin, ĐHQG TP.HCM, 30/05/2023.
+\newblock (Bốn ví dụ kiểm thử bắt buộc V01-V04 và mã giả tham chiếu.)
 
 \end{thebibliography}
 

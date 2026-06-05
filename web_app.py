@@ -1,141 +1,132 @@
-"""Flask web app cho Matrix Chain Multiplication — UI Demo."""
+"""Ứng dụng web demo cho Matrix Chain Multiplication.
 
-from flask import Flask, jsonify, render_template, request
+Một endpoint trang chủ và một endpoint API. API nhận mảng kích thước, giải
+bằng bottom-up, trả về bảng chi phí, bảng vị trí cắt, dấu ngoặc tối ưu và
+toàn bộ các bước lấp bảng để giao diện minh hoạ trực quan.
 
-from mcm.solver import matrix_chain_order, print_optimal_parens, MCMSolver
-from mcm.formatter import DisplayMode, format_table
+Chạy:
+    pip install flask
+    python web_app.py        # mở http://127.0.0.1:5001
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+# Cho phép chạy trực tiếp mà chưa cài gói: thêm src/ vào sys.path.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
+
+from flask import Flask, jsonify, render_template, request  # noqa: E402
+
+from mcm2.core import bottom_up, optimal_parenthesization, count_parenthesizations  # noqa: E402
+from mcm2.validation import validate_dimensions, DimensionError  # noqa: E402
 
 app = Flask(__name__)
 
 
 @app.route("/")
 def index():
-    """Trả về trang chủ."""
+    """Trả trang chủ."""
     return render_template("index.html")
 
 
 @app.route("/api/solve", methods=["POST"])
-def solve():
-    """Nhận Dimension_Array và trả về kết quả MCM.
+def api_solve():
+    """Giải bài toán và trả kết quả dạng JSON cho giao diện."""
+    data = request.get_json(force=True, silent=True) or {}
+    raw = data.get("dims", [])
 
-    Body JSON:
-        dims (list[int]): Dimension_Array p.
-
-    Returns:
-        JSON kết quả hoặc {"error": "..."}.
-    """
+    # Chuyển mọi phần tử về int; nếu không được thì báo lỗi rõ ràng.
     try:
-        data = request.get_json(force=True)
-        dims = data.get("dims", [])
+        dims = [int(x) for x in raw]
+    except (ValueError, TypeError):
+        return jsonify({"error": "Mọi phần tử kích thước phải là số nguyên"}), 400
 
-        # Validate input type
-        if not isinstance(dims, list):
-            return jsonify({"error": "dims phải là một mảng"}), 400
+    try:
+        n = validate_dimensions(dims)
+    except DimensionError as exc:
+        return jsonify({"error": str(exc)}), 400
 
-        # Convert to int
-        try:
-            dims = [int(x) for x in dims]
-        except (ValueError, TypeError):
-            return jsonify({"error": "Mọi phần tử của Dimension_Array phải là số nguyên"}), 400
+    cost, split = bottom_up(dims)
+    parens = optimal_parenthesization(split, 1, n)
+    steps = _build_steps(dims, n)
 
-        # Solve
-        solver = MCMSolver(dims)
+    # Đưa bảng về dạng list 2 chiều có None ở ô không dùng, tiện cho front-end.
+    # Bỏ row/col index 0 (padding), trả về ma trận n x n theo thứ tự A1..An.
+    cost_view = [
+        [None if i > j else cost[i][j] for j in range(1, n + 1)]
+        for i in range(1, n + 1)
+    ]
+    split_view = [
+        [None if i >= j else split[i][j] for j in range(1, n + 1)]
+        for i in range(1, n + 1)
+    ]
 
-        # Build m_table and s_table as 2D arrays (1-based, for display)
-        n = solver.n
-        m_display = []
-        for i in range(1, n + 1):
-            row = []
-            for j in range(1, n + 1):
-                if i > j:
-                    row.append(None)  # unused cell
-                else:
-                    row.append(solver.m[i][j])
-            m_display.append(row)
-
-        s_display = []
-        for i in range(1, n + 1):
-            row = []
-            for j in range(1, n + 1):
-                if i >= j:
-                    row.append(None)  # unused cell
-                else:
-                    row.append(solver.s[i][j])
-            s_display.append(row)
-
-        # Build step-by-step computation for visualization
-        steps = _build_steps(dims, n)
-
-        return jsonify({
+    return jsonify(
+        {
             "n": n,
-            "p": dims,
-            "cost": solver.cost,
-            "parens": solver.parens,
-            "m_table": m_display,
-            "s_table": s_display,
+            "dims": dims,
+            "min_cost": cost[1][n],
+            "parenthesization": parens,
+            "num_parenthesizations": count_parenthesizations(n),
+            "cost_table": cost_view,
+            "split_table": split_view,
             "steps": steps,
-        })
-
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        }
+    )
 
 
-def _build_steps(p, n):
-    """Xây dựng các bước tính toán chi tiết cho visualization."""
-    import math
+def _build_steps(p: list[int], n: int) -> list[dict]:
+    """Tái dựng từng bước lấp bảng để giao diện chiếu lại.
 
-    steps = []
-    m = [[0] * (n + 1) for _ in range(n + 1)]
-    s = [[0] * (n + 1) for _ in range(n + 1)]
+    Mỗi bước ứng với một ô (i, j) và liệt kê mọi vị trí cắt k đã thử cùng
+    công thức chi tiết, đánh dấu lựa chọn tối ưu.
+    Dùng chỉ số 1-based cho cả ma trận lẫn bảng (theo CLRS).
+    """
+    cost = [[0] * (n + 1) for _ in range(n + 1)]
+    split = [[0] * (n + 1) for _ in range(n + 1)]
+    steps: list[dict] = []
 
-    # Step 0: Initialization
-    steps.append({
-        "title": "Khởi tạo",
-        "description": "Đặt m[i][i] = 0 cho mọi i = 1..n (nhân 1 ma trận không tốn chi phí)",
-        "type": "init",
-        "cells_updated": [{"i": i, "j": i, "value": 0} for i in range(1, n + 1)],
-    })
-
-    # Steps for each chain length
     for length in range(2, n + 1):
         for i in range(1, n - length + 2):
             j = i + length - 1
-            m[i][j] = math.inf
+            best = float("inf")
             best_k = i
             candidates = []
-
             for k in range(i, j):
-                q = m[i][k] + m[k + 1][j] + p[i - 1] * p[k] * p[j]
-                candidates.append({
-                    "k": k,
-                    "cost": q,
-                    "formula": f"m[{i}][{k}] + m[{k+1}][{j}] + p[{i-1}]·p[{k}]·p[{j}] = {m[i][k]} + {m[k+1][j]} + {p[i-1]}·{p[k]}·{p[j]} = {q}",
-                })
-                if q < m[i][j]:
-                    m[i][j] = q
-                    s[i][j] = k
+                # Công thức CLRS: p[i-1] * p[k] * p[j]
+                q = cost[i][k] + cost[k + 1][j] + p[i - 1] * p[k] * p[j]
+                candidates.append(
+                    {
+                        "k": k,
+                        "value": q,
+                        "formula": (
+                            f"cost[{i}][{k}] + cost[{k + 1}][{j}] "
+                            f"+ p[{i - 1}]*p[{k}]*p[{j}] = "
+                            f"{cost[i][k]} + {cost[k + 1][j]} + "
+                            f"{p[i - 1] * p[k] * p[j]} = {q}"
+                        ),
+                    }
+                )
+                if q < best:
+                    best = q
                     best_k = k
-
-            steps.append({
-                "title": f"Tính m[{i}][{j}] (chuỗi dài {length}: A{i}..A{j})",
-                "description": f"Thử mọi vị trí tách k = {i}..{j-1}, chọn k tối ưu",
-                "type": "compute",
-                "i": i,
-                "j": j,
-                "length": length,
-                "candidates": candidates,
-                "best_k": best_k,
-                "best_cost": int(m[i][j]),
-                "cells_updated": [
-                    {"i": i, "j": j, "value": int(m[i][j]), "table": "m"},
-                    {"i": i, "j": j, "value": best_k, "table": "s"},
-                ],
-            })
-
+            cost[i][j] = best
+            split[i][j] = best_k
+            steps.append(
+                {
+                    "length": length,
+                    "i": i,
+                    "j": j,
+                    "candidates": candidates,
+                    "best_k": best_k,
+                    "best_cost": int(best),
+                }
+            )
     return steps
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # Cổng 5001 để không đụng cổng 5000 nếu có service khác.
+    app.run(debug=True, port=5001)

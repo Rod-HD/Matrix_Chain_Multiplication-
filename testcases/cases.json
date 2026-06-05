@@ -1,0 +1,120 @@
+{
+  "valid": [
+    {
+      "id": "V01",
+      "desc": "Ba ma trận, ví dụ trong tài liệu môn học",
+      "dims": [3, 10, 7, 2],
+      "expected_cost": 200,
+      "expected_parens": "(A1(A2A3))"
+    },
+    {
+      "id": "V02",
+      "desc": "Bốn ma trận, tách phải rồi gộp trái",
+      "dims": [10, 20, 50, 1, 100],
+      "expected_cost": 2200,
+      "expected_parens": "((A1(A2A3))A4)"
+    },
+    {
+      "id": "V03",
+      "desc": "Sáu ma trận, ví dụ kinh điển Cormen hình 15.5",
+      "dims": [30, 35, 15, 5, 10, 20, 25],
+      "expected_cost": 15125,
+      "expected_parens": "((A1(A2A3))((A4A5)A6))"
+    },
+    {
+      "id": "V04",
+      "desc": "Biên: một ma trận, không có phép nhân nào",
+      "dims": [5, 7],
+      "expected_cost": 0,
+      "expected_parens": "A1"
+    },
+    {
+      "id": "V05",
+      "desc": "Hai ma trận, chỉ một cách nhân duy nhất",
+      "dims": [10, 30, 5],
+      "expected_cost": 1500,
+      "expected_parens": "(A1A2)"
+    },
+    {
+      "id": "V06",
+      "desc": "Ba ma trận cho thấy thứ tự ngoặc đổi chi phí gấp 10 lần",
+      "dims": [10, 100, 5, 50],
+      "expected_cost": 7500,
+      "expected_parens": "((A1A2)A3)"
+    },
+    {
+      "id": "V07",
+      "desc": "Kích thước tăng dần, dồn ngoặc về trái",
+      "dims": [1, 2, 3, 4, 5],
+      "expected_cost": 38,
+      "expected_parens": "(((A1A2)A3)A4)"
+    },
+    {
+      "id": "V08",
+      "desc": "Kích thước giảm dần, dồn ngoặc về phải",
+      "dims": [5, 4, 3, 2, 1],
+      "expected_cost": 38,
+      "expected_parens": "(A1(A2(A3A4)))"
+    },
+    {
+      "id": "V09",
+      "desc": "Mọi kích thước bằng nhau, nhiều lời giải cùng chi phí",
+      "dims": [2, 2, 2, 2, 2],
+      "expected_cost": 24,
+      "expected_parens": "(A1(A2(A3A4)))"
+    },
+    {
+      "id": "V10",
+      "desc": "Kích thước dao động mạnh, ép tách ở giữa",
+      "dims": [100, 1, 100, 1, 100],
+      "expected_cost": 10200,
+      "expected_parens": "(A1((A2A3)A4))"
+    },
+    {
+      "id": "V11",
+      "desc": "Bảy ma trận, kích thước hỗn hợp không quy luật",
+      "dims": [4, 10, 3, 12, 20, 7, 5, 8],
+      "expected_cost": 1581,
+      "expected_parens": "((A1A2)((((A3A4)A5)A6)A7))"
+    },
+    {
+      "id": "V12",
+      "desc": "Số nguyên tố không cấu trúc đặc biệt",
+      "dims": [13, 5, 89, 3, 34],
+      "expected_cost": 2856,
+      "expected_parens": "((A1(A2A3))A4)"
+    }
+  ],
+  "invalid": [
+    {
+      "id": "E01",
+      "desc": "Mảng một phần tử, không đủ mô tả ma trận nào",
+      "dims": [5],
+      "expected_error": "Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận"
+    },
+    {
+      "id": "E02",
+      "desc": "Mảng rỗng",
+      "dims": [],
+      "expected_error": "Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận"
+    },
+    {
+      "id": "E03",
+      "desc": "Chứa phần tử bằng 0",
+      "dims": [10, 0, 5],
+      "expected_error": "Phần tử tại vị trí 1 phải là số nguyên dương, nhận 0"
+    },
+    {
+      "id": "E04",
+      "desc": "Chứa phần tử âm",
+      "dims": [10, -3, 5],
+      "expected_error": "Phần tử tại vị trí 1 phải là số nguyên dương, nhận -3"
+    },
+    {
+      "id": "E05",
+      "desc": "Chứa số thực, không phải số nguyên",
+      "dims": [10, 2.5, 5],
+      "expected_error": "Phần tử tại vị trí 1 không phải số nguyên: 2.5"
+    }
+  ]
+}

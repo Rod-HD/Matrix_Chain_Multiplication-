@@ -4,16 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mcm"
-version = "0.1.0"
-description = "Matrix Chain Multiplication (MCM) — quy hoạch động Bottom-Up theo CLRS 15.2."
+version = "1.0.0"
+description = "Matrix Chain Multiplication - quy hoạch động trên đoạn, ba lời giải đối chiếu."
 requires-python = ">=3.10"
-# Không có runtime dependency (chỉ dùng thư viện chuẩn — Req 8.3).
+# Phần lõi chỉ dùng thư viện chuẩn. Web demo cần Flask (tùy chọn).
 dependencies = []
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-]
+dev = ["pytest>=7.0"]
+web = ["flask>=3.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

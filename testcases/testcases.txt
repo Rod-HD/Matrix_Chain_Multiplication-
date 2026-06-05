@@ -1,0 +1,62 @@
+BỘ TESTCASE - Matrix Chain Multiplication
+=========================================================
+Tổng: 17 ca (12 hợp lệ + 5 sai)
+Chạy: python testcases/run_testcases.py
+=========================================================
+
+
+NHÓM 1 - INPUT HỢP LỆ (12 ca)
+---------------------------------------------------------
+Tiêu chí: PASS khi cả cost lẫn parens khớp giá trị mong đợi.
+Mọi expected_cost đã đối chiếu với naive_min_cost (liệt kê toàn bộ).
+
+ID   n  Mảng kích thước p              Cost    Dấu ngoặc tối ưu
+---  -  ----------------------------   ------  -------------------------
+V01  3  [3, 10, 7, 2]                  200     (A1(A2A3))
+V02  4  [10, 20, 50, 1, 100]           2200    ((A1(A2A3))A4)
+V03  6  [30, 35, 15, 5, 10, 20, 25]   15125   ((A1(A2A3))((A4A5)A6))
+V04  1  [5, 7]                         0       A1
+V05  2  [10, 30, 5]                    1500    (A1A2)
+V06  3  [10, 100, 5, 50]               7500    ((A1A2)A3)
+V07  4  [1, 2, 3, 4, 5]               38      (((A1A2)A3)A4)
+V08  4  [5, 4, 3, 2, 1]               38      (A1(A2(A3A4)))
+V09  4  [2, 2, 2, 2, 2]               24      (A1(A2(A3A4)))
+V10  4  [100, 1, 100, 1, 100]         10200   (A1((A2A3)A4))
+V11  7  [4, 10, 3, 12, 20, 7, 5, 8]  1581    ((A1A2)((((A3A4)A5)A6)A7))
+V12  4  [13, 5, 89, 3, 34]            2856    ((A1(A2A3))A4)
+
+Mô tả từng ca:
+  V01  Ba ma trận, ví dụ trong tài liệu môn học
+  V02  Bốn ma trận, tách phải rồi gộp trái
+  V03  Sáu ma trận, ví dụ kinh điển Cormen hình 15.5 (trang 376)
+  V04  Biên: một ma trận, không có phép nhân nào
+  V05  Hai ma trận, chỉ một cách nhân duy nhất
+  V06  Ba ma trận, thứ tự ngoặc đổi chi phí gấp 10 lần
+         ((A1A2)A3): 10*100*5 + 10*5*50  =  5000 + 2500  =  7500
+         (A1(A2A3)): 100*5*50 + 10*100*50 = 25000 + 50000 = 75000
+  V07  Kích thước tăng dần, dồn ngoặc về trái
+  V08  Kích thước giảm dần, dồn ngoặc về phải
+  V09  Mọi kích thước bằng nhau, nhiều lời giải cùng chi phí 24
+  V10  Kích thước dao động mạnh, ép tách ở giữa
+  V11  Bảy ma trận, kích thước hỗn hợp không quy luật
+  V12  Số nguyên tố không cấu trúc đặc biệt
+
+
+NHÓM 2 - INPUT SAI (5 ca)
+---------------------------------------------------------
+Tiêu chí: PASS khi ném DimensionError với thông điệp trùng khớp nguyên văn.
+
+ID   Input           Thông điệp lỗi mong đợi
+---  --------------  ------------------------------------------------------------------
+E01  [5]             Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận
+E02  []              Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận
+E03  [10, 0, 5]      Phần tử tại vị trí 1 phải là số nguyên dương, nhận 0
+E04  [10, -3, 5]     Phần tử tại vị trí 1 phải là số nguyên dương, nhận -3
+E05  [10, 2.5, 5]    Phần tử tại vị trí 1 không phải số nguyên: 2.5
+
+Mô tả từng ca:
+  E01  Mảng một phần tử, không đủ mô tả ma trận nào
+  E02  Mảng rỗng
+  E03  Chứa phần tử bằng 0
+  E04  Chứa phần tử âm
+  E05  Chứa số thực, không phải số nguyên

@@ -22,6 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
       renderBuilder();
     }
   });
+
+  // Keyboard input: type the desired count and press Enter
+  $("matrix-count-input").addEventListener("change", applyCountInput);
+  $("matrix-count-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") applyCountInput();
+  });
   $("apply-dims").addEventListener("click", applyRawDims);
   $("dims").addEventListener("keydown", (e) => {
     if (e.key === "Enter") applyRawDims();
@@ -171,6 +177,7 @@ function renderBuilder() {
   });
 
   $("matrix-count").textContent = `${matrices.length} ma trận`;
+  $("matrix-count-input").value = matrices.length;
   $("rm-matrix").disabled = matrices.length <= 1;
 
   // Cập nhật phần xem trước.
@@ -182,7 +189,16 @@ function renderBuilder() {
   $("dims").value = p.join(" ");
 }
 
-// Áp dụng mảng p nhập tay ở phần nâng cao.
+// Apply count from the keyboard number input
+function applyCountInput() {
+  const el = $("matrix-count-input");
+  let target = Math.max(1, Math.min(20, parseInt(el.value) || 1));
+  el.value = target;
+  // Add or remove matrices to reach target count
+  while (matrices.length < target) addMatrix();
+  while (matrices.length > target) matrices.pop();
+  renderBuilder();
+}
 function applyRawDims() {
   const raw = $("dims").value.trim();
   const p = raw
@@ -294,14 +310,134 @@ function moveStep(delta) {
   switchTab("steps");
 }
 
+// ─── SVG Tree + Trace ────────────────────────────────────────────────────────
+
 function renderTree() {
-  const split = current.split_table; // 1-based values directly (no conversion needed)
-  function build(i, j) {
-    if (i === j) return `<span class="node">A${i}</span>`;
-    const k = split[i - 1][j - 1]; // split_table is 0-indexed in the JSON array (row i-1, col j-1)
-    return `(${build(i, k)} ${build(k + 1, j)})`;
+  if (!current) return;
+  const split = current.split_table; // 0-indexed array, values 1-based
+  const dims  = current.dims;
+  const n     = current.n;
+
+  // 1) Build logical tree nodes (BFS layout)
+  // Each node: { i, j, k, left, right, depth, x, y }
+  function buildTree(i, j) {
+    if (i === j) return { i, j, leaf: true };
+    const k = split[i - 1][j - 1]; // split_table rows/cols are 0-indexed
+    return { i, j, k, leaf: false,
+             left: buildTree(i, k), right: buildTree(k + 1, j) };
   }
-  $("tree-view").innerHTML = build(1, current.n);
+  const root = buildTree(1, n);
+
+  // 2) Assign layout positions (in-order x, depth y)
+  const NODE_W = 80, NODE_H = 48, GAP_X = 12, GAP_Y = 56;
+  let xCursor = 0;
+
+  function layout(node, depth) {
+    node.depth = depth;
+    if (node.leaf) {
+      node.cx = xCursor * (NODE_W + GAP_X) + NODE_W / 2;
+      xCursor++;
+    } else {
+      layout(node.left, depth + 1);
+      const leftCx = node.left.cx;
+      layout(node.right, depth + 1);
+      const rightCx = node.right.cx;
+      node.cx = (leftCx + rightCx) / 2;
+    }
+    node.cy = depth * (NODE_H + GAP_Y) + NODE_H / 2;
+  }
+  layout(root, 0);
+
+  const svgW = xCursor * (NODE_W + GAP_X) + 40;
+  const svgH = (getDepth(root) + 1) * (NODE_H + GAP_Y) + 20;
+
+  function getDepth(node) {
+    if (node.leaf) return 0;
+    return 1 + Math.max(getDepth(node.left), getDepth(node.right));
+  }
+
+  // 3) Render SVG
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg");
+  svg.setAttribute("width", svgW);
+  svg.setAttribute("height", svgH);
+  svg.setAttribute("viewBox", `0 0 ${svgW} ${svgH}`);
+
+  const LEAF_BG = "#86efac", LEAF_FG = "#052e16";
+  const INNER_BG = "#f59e0b", INNER_FG = "#1a0a00";
+  const LINE_COLOR = "#94a3b8";
+
+  function drawNode(node) {
+    const x = node.cx - NODE_W / 2;
+    const y = node.cy - NODE_H / 2;
+
+    // Edge to children
+    if (!node.leaf) {
+      for (const child of [node.left, node.right]) {
+        const line = document.createElementNS(NS, "line");
+        line.setAttribute("x1", node.cx); line.setAttribute("y1", node.cy + NODE_H / 2);
+        line.setAttribute("x2", child.cx); line.setAttribute("y2", child.cy - NODE_H / 2);
+        line.setAttribute("stroke", LINE_COLOR);
+        line.setAttribute("stroke-width", "1.5");
+        svg.appendChild(line);
+      }
+    }
+
+    // Node box
+    const rect = document.createElementNS(NS, "rect");
+    rect.setAttribute("x", x); rect.setAttribute("y", y);
+    rect.setAttribute("width", NODE_W); rect.setAttribute("height", NODE_H);
+    rect.setAttribute("rx", "8");
+    rect.setAttribute("fill", node.leaf ? LEAF_BG : INNER_BG);
+    svg.appendChild(rect);
+
+    // Text line 1
+    const t1 = document.createElementNS(NS, "text");
+    t1.setAttribute("x", node.cx);
+    t1.setAttribute("y", node.leaf ? node.cy + 5 : node.cy - 4);
+    t1.setAttribute("text-anchor", "middle");
+    t1.setAttribute("font-family", "Consolas, monospace");
+    t1.setAttribute("font-size", "13");
+    t1.setAttribute("font-weight", "700");
+    t1.setAttribute("fill", node.leaf ? LEAF_FG : INNER_FG);
+    t1.textContent = node.leaf ? `A${node.i}` : `k=${node.k}`;
+    svg.appendChild(t1);
+
+    // Text line 2 (range) for inner nodes
+    if (!node.leaf) {
+      const t2 = document.createElementNS(NS, "text");
+      t2.setAttribute("x", node.cx);
+      t2.setAttribute("y", node.cy + 11);
+      t2.setAttribute("text-anchor", "middle");
+      t2.setAttribute("font-family", "Consolas, monospace");
+      t2.setAttribute("font-size", "10");
+      t2.setAttribute("fill", INNER_FG);
+      t2.textContent = `A${node.i}..A${node.j}`;
+      svg.appendChild(t2);
+    }
+
+    if (!node.leaf) { drawNode(node.left); drawNode(node.right); }
+  }
+  drawNode(root);
+  $("tree-svg-wrap").innerHTML = "";
+  $("tree-svg-wrap").appendChild(svg);
+
+  // 4) Trace
+  function traceLines(node, indent) {
+    const pad = "  ".repeat(indent);
+    if (node.leaf) {
+      const dimStr = `${dims[node.i - 1]}×${dims[node.i]}`;
+      return [`${pad}<span class="trace-leaf">A${node.i} (${dimStr})</span>`];
+    }
+    const lines = [];
+    lines.push(`${pad}<span class="trace-split">split(${node.i},${node.j}) tại k=${node.k}:</span>`);
+    lines.push(`${pad}  Trái: A${node.i}..A${node.k}`);
+    lines.push(...traceLines(node.left, indent + 2));
+    lines.push(`${pad}  Phải: A${node.k + 1}..A${node.j}`);
+    lines.push(...traceLines(node.right, indent + 2));
+    return lines;
+  }
+  $("tree-trace").innerHTML = traceLines(root, 0).join("\n");
 }
 
 function switchTab(name) {

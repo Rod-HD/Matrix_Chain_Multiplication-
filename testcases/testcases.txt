@@ -26,9 +26,9 @@ V11  7  [4, 10, 3, 12, 20, 7, 5, 8]  1581    ((A1A2)((((A3A4)A5)A6)A7))
 V12  4  [13, 5, 89, 3, 34]            2856    ((A1(A2A3))A4)
 
 Mô tả từng ca:
-  V01  Ba ma trận, ví dụ trong tài liệu môn học
+  V01  Ba ma trận, ví dụ cơ bản
   V02  Bốn ma trận, tách phải rồi gộp trái
-  V03  Sáu ma trận, ví dụ kinh điển Cormen hình 15.5 (trang 376)
+  V03  Sáu ma trận, ví dụ kinh điển
   V04  Biên: một ma trận, không có phép nhân nào
   V05  Hai ma trận, chỉ một cách nhân duy nhất
   V06  Ba ma trận, thứ tự ngoặc đổi chi phí gấp 10 lần

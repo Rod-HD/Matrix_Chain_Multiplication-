@@ -2,7 +2,7 @@
   "valid": [
     {
       "id": "V01",
-      "desc": "Ba ma trận, ví dụ trong tài liệu môn học",
+      "desc": "Ba ma trận, ví dụ cơ bản",
       "dims": [3, 10, 7, 2],
       "expected_cost": 200,
       "expected_parens": "(A1(A2A3))"
@@ -16,7 +16,7 @@
     },
     {
       "id": "V03",
-      "desc": "Sáu ma trận, ví dụ kinh điển Cormen hình 15.5",
+      "desc": "Sáu ma trận, ví dụ kinh điển",
       "dims": [30, 35, 15, 5, 10, 20, 25],
       "expected_cost": 15125,
       "expected_parens": "((A1(A2A3))((A4A5)A6))"

@@ -23,10 +23,10 @@ python testcases/run_testcases.py
 
 ## Cách dựng giá trị mong đợi
 
-- Bốn ca `V01`-`V04` lấy từ ví dụ trong tài liệu môn học và Cormen.
-- Các ca `V05`-`V12` được thiết kế để phủ nhiều dạng cấu trúc: chuỗi 2 ma
-  trận (một cách nhân duy nhất), thứ tự ngoặc đổi chi phí lớn, kích thước
-  tăng/giảm/bằng nhau, dao động mạnh và hỗn hợp ngẫu nhiên.
+- Các ca `V01`-`V12` phủ nhiều dạng cấu trúc: chuỗi 1 ma trận (ca biên,
+  không có phép nhân), chuỗi 2 ma trận (một cách nhân duy nhất), thứ tự
+  ngoặc đổi chi phí lớn, kích thước tăng/giảm/bằng nhau, dao động mạnh và
+  hỗn hợp ngẫu nhiên.
 - Mọi `expected_cost` đều được đối chiếu độc lập bằng lời giải đệ quy thuần
   (`naive_min_cost`) liệt kê toàn bộ cách đặt ngoặc, nên là chi phí tối ưu
   thật. Với các ca có nhiều lời giải cùng chi phí (ví dụ `V09`), trường

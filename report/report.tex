@@ -329,7 +329,7 @@ Sau khi lấp bảng và dựng dấu ngoặc, hàm \texttt{solve} tính lại c
 \section{Ví dụ minh họa thuật toán}
 % =========================================================
 
-Xét ví dụ kinh điển với $p = [30, 35, 15, 5, 10, 20, 25]$, tức $n = 6$ ma trận: $A_1\,(30 \times 35)$, $A_2\,(35 \times 15)$, $A_3\,(15 \times 5)$, $A_4\,(5 \times 10)$, $A_5\,(10 \times 20)$, $A_6\,(20 \times 25)$. Ví dụ này có trong cả CLRS lẫn slide bài giảng nên tiện đối chiếu.
+Xét ví dụ kinh điển với $p = [30, 35, 15, 5, 10, 20, 25]$, tức $n = 6$ ma trận: $A_1\,(30 \times 35)$, $A_2\,(35 \times 15)$, $A_3\,(15 \times 5)$, $A_4\,(5 \times 10)$, $A_5\,(10 \times 20)$, $A_6\,(20 \times 25)$. Đây là ví dụ kinh điển 6 ma trận, đủ lớn để thấy rõ cách lấp bảng theo độ dài đoạn.
 
 \subsection{Lấp bảng theo độ dài đoạn}
 
@@ -510,14 +510,14 @@ Hệ thống có hai lớp kiểm thử bổ trợ nhau.
 
 \paragraph{(a) Bộ testcase tường minh} nằm trong \texttt{testcases/}, gồm tệp dữ liệu \texttt{cases.json} và trình chấm \texttt{run\_testcases.py}. Dữ liệu chia hai nhóm:
 \begin{itemize}
-  \item \emph{Nhóm hợp lệ} (12 ca): mỗi ca ghi mảng kích thước, chi phí kỳ vọng và dấu ngoặc kỳ vọng. Bốn ca đầu lấy từ ví dụ trong tài liệu và CLRS; tám ca còn lại thiết kế để phủ nhiều dạng cấu trúc: chuỗi hai ma trận (chỉ một cách nhân), trường hợp thứ tự ngoặc đổi chi phí gấp mười lần, kích thước tăng dần, giảm dần, bằng nhau, dao động mạnh, và hỗn hợp không quy luật.
+  \item \emph{Nhóm hợp lệ} (12 ca): mỗi ca ghi mảng kích thước, chi phí kỳ vọng và dấu ngoặc kỳ vọng. Các ca phủ nhiều dạng cấu trúc: chuỗi một ma trận (ca biên, không có phép nhân), chuỗi hai ma trận (chỉ một cách nhân), trường hợp thứ tự ngoặc đổi chi phí gấp mười lần, kích thước tăng dần, giảm dần, bằng nhau, dao động mạnh, và hỗn hợp không quy luật.
   \item \emph{Nhóm sai} (4 ca): phủ hai nhánh kiểm tra dữ liệu - mảng quá ngắn và phần tử không phải số nguyên dương (bao gồm phần tử = 0, phần tử âm, và số thực) - và đối chiếu thông điệp lỗi trùng khớp từng ký tự.
 \end{itemize}
 
 \paragraph{(b) Bộ kiểm thử tự động} nằm trong \texttt{tests/}, chạy bằng \texttt{pytest}. Gồm test ví dụ cụ thể, test thông điệp lỗi, và một số test \emph{dựa trên tính chất} (property-based). Vì yêu cầu chỉ dùng thư viện chuẩn nên thay cho thư viện sinh dữ liệu chuyên dụng, các test tính chất dùng \texttt{random.Random(seed)} với seed cố định, mỗi test sinh từ 150 đến 200 mẫu ngẫu nhiên và có thể tái lập nhờ seed.
 
 \subsection{Cách xây dựng giá trị kỳ vọng}
-Đây là điểm cần cẩn thận: nếu \enquote{đáp án mẫu} tự đặt cũng sai thì test vô nghĩa. Vì vậy mọi chi phí kỳ vọng của ca tự thiết kế đều được đối chiếu độc lập bằng lời giải đệ quy thuần (\texttt{naive\_min\_cost}) - thuật toán này liệt kê toàn bộ cách đặt ngoặc nên chắc chắn cho cực tiểu thật. Với các ca có nhiều lời giải cùng chi phí (ví dụ ca mọi kích thước bằng nhau), dấu ngoặc kỳ vọng được ghi đúng theo dấu ngoặc mà bản bottom-up chọn, để test không phụ thuộc vào việc \enquote{đoán} một trong nhiều đáp án tối ưu.
+Đây là điểm cần cẩn thận: nếu \enquote{đáp án mẫu} tự đặt cũng sai thì test vô nghĩa. Vì vậy mọi chi phí kỳ vọng đều được đối chiếu độc lập bằng lời giải đệ quy thuần (\texttt{naive\_min\_cost}) - thuật toán này liệt kê toàn bộ cách đặt ngoặc nên chắc chắn cho cực tiểu thật. Với các ca có nhiều lời giải cùng chi phí (ví dụ ca mọi kích thước bằng nhau), dấu ngoặc kỳ vọng được ghi đúng theo dấu ngoặc mà bản bottom-up chọn, để test không phụ thuộc vào việc \enquote{đoán} một trong nhiều đáp án tối ưu.
 
 \subsection{Cách đánh giá đúng/sai}
 \begin{itemize}
@@ -763,7 +763,7 @@ Huỳnh Thị Thanh Thương.
 \newblock \emph{Bài giảng 16: Thiết kế thuật toán -- Kỹ thuật Quy hoạch động},
     môn Phân tích và Thiết kế Thuật toán (CS112), mã học phần C3T13.
 \newblock Trường Đại học Công nghệ Thông tin, ĐHQG TP.HCM, 30/05/2023.
-\newblock (Bốn ví dụ kiểm thử bắt buộc V01-V04 và mã giả tham chiếu.)
+\newblock (Mã giả và công thức truy hồi tham chiếu.)
 
 \end{thebibliography}
 

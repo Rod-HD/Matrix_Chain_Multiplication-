@@ -14,9 +14,9 @@ Mỗi ca kiểm tra cả hai: **chi phí tối thiểu** (`expected_cost`) và *
 
 | ID  | Mô tả | Mảng kích thước p | n | Chi phí tối thiểu | Dấu ngoặc tối ưu |
 |-----|-------|-------------------|---|-------------------|------------------|
-| V01 | Ba ma trận, ví dụ trong tài liệu môn học | `[3, 10, 7, 2]` | 3 | 200 | `(A1(A2A3))` |
+| V01 | Ba ma trận, ví dụ cơ bản | `[3, 10, 7, 2]` | 3 | 200 | `(A1(A2A3))` |
 | V02 | Bốn ma trận, tách phải rồi gộp trái | `[10, 20, 50, 1, 100]` | 4 | 2200 | `((A1(A2A3))A4)` |
-| V03 | Sáu ma trận, ví dụ kinh điển Cormen hình 15.5 | `[30, 35, 15, 5, 10, 20, 25]` | 6 | 15125 | `((A1(A2A3))((A4A5)A6))` |
+| V03 | Sáu ma trận, ví dụ kinh điển | `[30, 35, 15, 5, 10, 20, 25]` | 6 | 15125 | `((A1(A2A3))((A4A5)A6))` |
 | V04 | Biên: một ma trận, không có phép nhân nào | `[5, 7]` | 1 | 0 | `A1` |
 | V05 | Hai ma trận, chỉ một cách nhân duy nhất | `[10, 30, 5]` | 2 | 1500 | `(A1A2)` |
 | V06 | Ba ma trận, thứ tự ngoặc đổi chi phí gấp 10 lần | `[10, 100, 5, 50]` | 3 | 7500 | `((A1A2)A3)` |
@@ -29,7 +29,7 @@ Mỗi ca kiểm tra cả hai: **chi phí tối thiểu** (`expected_cost`) và *
 
 ### Ghi chú một số ca đáng chú ý
 
-**V03** - ví dụ kinh điển từ CLRS hình 15.5, trang 376:
+**V03** - ví dụ kinh điển 6 ma trận:
 - `A1 = 30×35`, `A2 = 35×15`, `A3 = 15×5`, `A4 = 5×10`, `A5 = 10×20`, `A6 = 20×25`
 - Cách tối ưu: `((A1(A2A3))((A4A5)A6))` = 15125 phép nhân
 

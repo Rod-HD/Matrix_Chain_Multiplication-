@@ -302,8 +302,8 @@ chạy, seed cố định) và so tỉ lệ tăng với `Θ(n³)`.
 `bench_naive.py` đếm số lần gọi đệ quy: bản thuần tăng theo `~3^(n-1)`, bản ghi
 nhớ chỉ `n(n+1)/2` — minh hoạ trực tiếp lý do cần quy hoạch động.
 
-Số liệu tham khảo (Python 3.13): `n=50 ≈ 4ms`, `n=100 ≈ 31ms`, `n=200 ≈ 283ms`,
-`n=300 ≈ 1.2s`. Khi `n` tăng gấp đôi, thời gian tăng ~7–8 lần, đúng với `Θ(n³)`.
+Số liệu tham khảo (Python 3.13): `n=50 ≈ 2.3ms`, `n=100 ≈ 19ms`, `n=200 ≈ 150ms`,
+`n=300 ≈ 547ms`, `n=400 ≈ 1.5s`. Khi `n` tăng gấp đôi, thời gian tăng ~8 lần, đúng với `Θ(n³)`.
 
 ---
 
@@ -413,11 +413,11 @@ một lần. Đây cũng là điều kiện để hai ma trận liền kề nhâ
 - T. H. Cormen, C. E. Leiserson, R. L. Rivest, C. Stein. *Introduction to
   Algorithms*, Third Edition. The MIT Press, 2009. ISBN 978-0-262-03384-8.
   Chương 15, mục 15.2: Matrix-chain multiplication, trang 370-378.
-  *(Công thức truy hồi, quy ước chỉ số, bảng split, truy vết, 4 ví dụ kiểm thử.)*
+  *(Công thức truy hồi, quy ước chỉ số, bảng split, truy vết.)*
 - S. Dasgupta, C. H. Papadimitriou, U. V. Vazirani. *Algorithms*.
   Bản thảo, 2006. Chương 6, mục 6.5: Chain matrix multiplication.
   *(Phát biểu bài toán bổ sung.)*
 - Huỳnh Thị Thanh Thương. *Bài giảng 16: Thiết kế thuật toán - Kỹ thuật
   Quy hoạch động*, môn CS112, mã C3T13. UIT, 30/05/2023.
-  *(Bốn ví dụ kiểm thử bắt buộc V01-V04.)*
+  *(Mã giả và công thức truy hồi tham chiếu.)*
 ```

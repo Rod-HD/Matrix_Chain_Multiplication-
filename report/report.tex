@@ -676,6 +676,37 @@ python web_app.py              # mac dinh http://127.0.0.1:5001
 Với dữ liệu mẫu $p = [30, 35, 15, 5, 10, 20, 25]$, giao diện hiển thị chi phí $15125$, dấu ngoặc \texttt{((A1(A2A3))((A4A5)A6))}, số cách đặt ngoặc $42$, và 15 bước lấp bảng.
 
 % =========================================================
+\section{Tính năng mở rộng}
+% =========================================================
+
+Ngoài yêu cầu cốt lõi, dự án bổ sung một số tính năng nhằm nâng cao trải nghiệm học tập và kiểm chứng kết quả.
+
+\subsection{Ba lời giải đối chiếu}
+Thay vì chỉ cài một lời giải bottom-up, hệ thống cung cấp ba cách giải độc lập cùng tính toán trên một công thức truy hồi, để người dùng đối chiếu:
+\begin{itemize}
+  \item \textbf{Đệ quy thuần} (\texttt{naive\_min\_cost}): dịch trực tiếp công thức sang đệ quy, không lưu kết quả đoạn con. Số lần gọi tăng theo hàm mũ ($\sim 3^{n-1}$). Dùng để minh hoạ vì sao cần quy hoạch động và để làm đối chứng tính tối ưu cho $n \le 6$.
+  \item \textbf{Đệ quy có ghi nhớ} (\texttt{memoized\_min\_cost}): dùng \texttt{lru\_cache} để mỗi đoạn chỉ tính một lần; $O(n^3)$ thời gian, tính theo nhu cầu (top-down).
+  \item \textbf{Lấp bảng từ dưới lên} (\texttt{bottom\_up}): bản chính; $O(n^3)$ thời gian, $O(n^2)$ bộ nhớ, trả về đủ bảng để truy vết và minh hoạ.
+\end{itemize}
+Bộ kiểm thử xác nhận cả ba cho cùng chi phí trên mọi ví dụ, và bản đệ quy thuần làm đối chứng \emph{tối ưu toàn cục}: $\mathrm{cost}[1][n]$ của bottom-up bằng chi phí nhỏ nhất khi liệt kê toàn bộ $C_{n-1}$ cách đặt ngoặc.
+
+\subsection{Giao diện nhập liệu trực quan}
+Điểm khó với người mới là hiểu mảng $p$: nó không phải kích thước của từng ma trận mà là \emph{chuỗi mốc kích thước nối tiếp} -- con số ở giữa vừa là số cột của ma trận trước vừa là số hàng của ma trận sau. Giao diện web giải quyết bằng \emph{bộ dựng theo từng ma trận}:
+\begin{itemize}
+  \item Mỗi ma trận hiển thị dưới dạng \texttt{Ai: [hàng] $\times$ [cột]}; thêm/bớt bằng nút $+$/$-$.
+  \item Ô số hàng của mọi ma trận (trừ ma trận đầu) bị khoá và tô đỏ, tự lấy bằng số cột của ma trận liền trước -- đảm bảo ràng buộc ``cột trước = hàng sau'' và không thể nhập chuỗi không hợp lệ.
+  \item Xem trước hiển thị song song chuỗi ma trận (ví dụ \texttt{A1(30$\times$35) $\cdot$ A2(35$\times$15) $\cdots$}) và mảng $p$ tương ứng.
+  \item Khối giải thích thu gọn (bấm để mở) trình bày quy tắc $A_i = p[i{-}1] \times p[i]$ kèm sơ đồ minh hoạ mỗi ma trận trải dưới hai mốc liền kề.
+\end{itemize}
+
+\subsection{Triển khai trực tuyến}
+Ứng dụng web được triển khai công khai tại:
+\begin{center}
+\url{https://matrix-chain-multiplication.onrender.com}
+\end{center}
+Máy chủ dùng \textbf{Render.com} (nền tảng PaaS), chạy Flask qua Gunicorn. Cấu hình khai báo trong \texttt{render.yaml}: build bằng \texttt{pip install -r requirements.txt \&\& pip install -e .}, start bằng \texttt{gunicorn web\_app:app}. Người dùng không cần cài đặt gì, mở trình duyệt và nhập thẳng mảng kích thước.
+
+% =========================================================
 \section{So sánh với công cụ AI}
 % =========================================================
 

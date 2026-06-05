@@ -332,9 +332,6 @@ def optimal_parenthesization(split, i, j):
     return f"({left}{right})"
 \end{lstlisting}
 
-\subsection{Kiểm tra chéo nội bộ}
-Sau khi lấp bảng và dựng dấu ngoặc, hàm \texttt{solve} tính lại chi phí một lần nữa, lần này \emph{chỉ dựa trên bảng split} (độc lập với bảng cost), rồi so với $\mathrm{cost}[1][n]$. Nếu hai con số lệch nhau, chương trình báo lỗi ngay thay vì in kết quả sai.
-
 % =========================================================
 \section{Ví dụ minh họa thuật toán}
 % =========================================================
@@ -535,6 +532,7 @@ Hệ thống có hai lớp kiểm thử bổ trợ nhau.
   \item Ca sai: đúng khi chương trình ném ngoại lệ \texttt{DimensionError} với thông điệp trùng khớp nguyên văn.
   \item Test tính chất \enquote{tối ưu thực sự}: so chi phí của bottom-up và top-down với chi phí liệt kê toàn bộ; đây là kiểm chứng mạnh nhất vì xác nhận lời giải đạt cực tiểu toàn cục, không chỉ tự nhất quán.
   \item Test tính chất \enquote{dấu ngoặc hợp lệ}: kiểm tra ngoặc cân bằng ở mọi tiền tố và các tên $A_1, \ldots, A_n$ xuất hiện đúng thứ tự.
+  \item Kiểm tra chéo nội bộ: sau khi lấp bảng và dựng dấu ngoặc, hàm \texttt{solve} tính lại chi phí một lần nữa \emph{chỉ dựa trên bảng split} (độc lập với bảng cost) rồi so với $\mathrm{cost}[1][n]$; nếu hai con số lệch nhau, chương trình báo lỗi ngay thay vì in kết quả sai.
 \end{itemize}
 
 \subsection{Quy mô thử nghiệm}

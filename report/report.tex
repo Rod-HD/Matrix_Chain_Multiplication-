@@ -202,7 +202,7 @@ Tìm cách đặt dấu ngoặc đầy đủ cho tích $A_1 A_2 \cdots A_n$ sao 
 \end{definition}
 
 \subsection{Quy mô không gian tìm kiếm}
-Gọi $P(n)$ là số cách đặt dấu ngoặc cho $n$ ma trận. Trong mỗi cách đặt ngoặc, phép nhân thực hiện sau cùng tách chuỗi tại một vị trí $k$ nào đó thành hai nhóm $A_1 \cdots A_k$ và $A_{k+1} \cdots A_n$, và mỗi nhóm lại được đặt ngoặc độc lập; lấy tổng trên mọi $k$ ta được
+Gọi $P(n)$ là số cách đặt dấu ngoặc cho $n$ ma trận. Ở mức ngoài cùng, mọi cách đặt ngoặc đều có dạng $(A_1 \cdots A_k)\,(A_{k+1} \cdots A_n)$ với một điểm tách $k$ nào đó ($1 \le k \le n-1$); hai nhóm con ở hai bên lại được đặt ngoặc độc lập. Phân loại theo $k$ rồi lấy tổng, ta được
 \[
 P(1) = 1, \qquad P(n) = \sum_{k=1}^{n-1} P(k)\,P(n-k).
 \]

@@ -32,11 +32,11 @@ Chờ ra dòng `42 passed`.
 ```
 python testcases/run_testcases.py
 ```
-Cuộn cho thấy `17/17 ca PASS`.
+Cuộn cho thấy `16/16 ca PASS`.
 
 > "Bộ pytest có 42 test, gồm test ví dụ, test thông điệp lỗi, và test sinh
 > ngẫu nhiên đối chiếu với liệt kê toàn bộ. Tất cả đều pass. Bộ testcase
-> tường minh có 17 ca - 12 ca hợp lệ kiểm tra chi phí và dấu ngoặc, 5 ca sai
+> tường minh có 16 ca - 12 ca hợp lệ kiểm tra chi phí và dấu ngoặc, 4 ca sai
 > kiểm tra thông điệp lỗi. Tất cả đều đúng."
 
 ---

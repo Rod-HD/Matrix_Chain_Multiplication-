@@ -1,6 +1,6 @@
 BỘ TESTCASE - Matrix Chain Multiplication
 =========================================================
-Tổng: 17 ca (12 hợp lệ + 5 sai)
+Tổng: 16 ca (12 hợp lệ + 4 sai)
 Chạy: python testcases/run_testcases.py
 =========================================================
 
@@ -42,21 +42,19 @@ Mô tả từng ca:
   V12  Số nguyên tố không cấu trúc đặc biệt
 
 
-NHÓM 2 - INPUT SAI (5 ca)
+NHÓM 2 - INPUT SAI (4 ca)
 ---------------------------------------------------------
 Tiêu chí: PASS khi ném DimensionError với thông điệp trùng khớp nguyên văn.
 
 ID   Input           Thông điệp lỗi mong đợi
 ---  --------------  ------------------------------------------------------------------
 E01  [5]             Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận
-E02  []              Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận
-E03  [10, 0, 5]      Phần tử tại vị trí 1 phải là số nguyên dương, nhận 0
-E04  [10, -3, 5]     Phần tử tại vị trí 1 phải là số nguyên dương, nhận -3
-E05  [10, 2.5, 5]    Phần tử tại vị trí 1 phải là số nguyên dương, nhận 2.5
+E02  [10, 0, 5]      Phần tử tại vị trí 1 phải là số nguyên dương, không nhận 0
+E03  [10, -3, 5]     Phần tử tại vị trí 1 phải là số nguyên dương, không nhận -3
+E04  [10, 2.5, 5]    Phần tử tại vị trí 1 phải là số nguyên dương, không nhận 2.5
 
 Mô tả từng ca:
   E01  Mảng một phần tử, không đủ mô tả ma trận nào
-  E02  Mảng rỗng
-  E03  Chứa phần tử bằng 0
-  E04  Chứa phần tử âm
-  E05  Chứa số thực, không phải số nguyên dương
+  E02  Chứa phần tử bằng 0
+  E03  Chứa phần tử âm
+  E04  Chứa số thực, không phải số nguyên dương

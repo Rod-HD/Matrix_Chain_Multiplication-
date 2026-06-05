@@ -29,21 +29,21 @@ def test_too_short(dims):
 
 @pytest.mark.parametrize("dims", [[10, 0, 5], [10, -3, 5], [1, 2, 0]])
 def test_non_positive(dims):
-    """Phần tử <= 0 bị từ chối."""
-    with pytest.raises(DimensionError, match="số nguyên dương"):
+    """Phần tử <= 0 bị từ chối với thông điệp 'không nhận'."""
+    with pytest.raises(DimensionError, match="không nhận"):
         validate_dimensions(dims)
 
 
 @pytest.mark.parametrize("dims", [[10, 2.5, 5], [1, "2", 3], [1, 2.0, 3]])
 def test_not_integer(dims):
-    """Phần tử không phải int dương bị từ chối với thông điệp 'số nguyên dương'."""
-    with pytest.raises(DimensionError, match="số nguyên dương"):
+    """Phần tử không phải int dương bị từ chối với thông điệp 'không nhận'."""
+    with pytest.raises(DimensionError, match="không nhận"):
         validate_dimensions(dims)
 
 
 def test_bool_rejected():
     """bool là lớp con của int nhưng không được coi là kích thước hợp lệ."""
-    with pytest.raises(DimensionError, match="số nguyên dương"):
+    with pytest.raises(DimensionError, match="không nhận"):
         validate_dimensions([True, 2, 3])
 
 

@@ -278,13 +278,13 @@ Gồm: test 4 ví dụ bắt buộc, test ba lời giải cho cùng kết quả,
 lỗi, và các test dựa trên tính chất (sinh ngẫu nhiên bằng `random.Random(seed)`
 cố định, đối chiếu với liệt kê toàn bộ để chứng minh tối ưu toàn cục).
 
-### Bộ testcase tường minh (17 ca)
+### Bộ testcase tường minh (16 ca)
 
 ```bash
 python testcases/run_testcases.py
 ```
 
-In bảng PASS/FAIL cho 12 ca hợp lệ + 5 ca sai. Dữ liệu ở `testcases/cases.json`,
+In bảng PASS/FAIL cho 12 ca hợp lệ + 4 ca sai. Dữ liệu ở `testcases/cases.json`,
 mọi chi phí kỳ vọng đã được đối chiếu độc lập bằng `naive_min_cost`.
 
 ---
@@ -323,7 +323,7 @@ matrix-chain/
 │   ├── test_core.py
 │   └── test_display.py
 ├── testcases/
-│   ├── cases.json         # 12 ca hợp lệ + 5 ca sai (máy đọc)
+│   ├── cases.json         # 12 ca hợp lệ + 4 ca sai (máy đọc)
 │   ├── testcases.md       # dữ liệu test dạng bảng Markdown
 │   ├── testcases.txt      # dữ liệu test dạng văn bản thuần
 │   ├── run_testcases.py   # trình chấm
@@ -398,8 +398,7 @@ một lần. Đây cũng là điều kiện để hai ma trận liền kề nhâ
 | Tình huống | Thông điệp / hành vi |
 |---|---|
 | Mảng dưới 2 phần tử | `DimensionError`: "Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận" |
-| Phần tử ≤ 0 | `DimensionError`: "Phần tử tại vị trí i phải là số nguyên dương, nhận ..." |
-| Phần tử không phải số nguyên | `DimensionError`: "Phần tử tại vị trí i không phải số nguyên: ..." |
+| Phần tử ≤ 0 hoặc không phải số nguyên (số thực, chuỗi, bool) | `DimensionError`: "Phần tử tại vị trí i phải là số nguyên dương, không nhận ..." |
 | `ModuleNotFoundError: mcm2` | chưa `pip install -e .`, hoặc chưa kích hoạt venv |
 | `ModuleNotFoundError: flask` | chỉ cần khi chạy web demo: `pip install flask` |
 | Tiếng Việt lỗi font trên Windows console | đặt `set PYTHONIOENCODING=utf-8` trước khi chạy |

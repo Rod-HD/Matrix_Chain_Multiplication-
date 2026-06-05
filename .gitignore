@@ -41,3 +41,6 @@ htmlcov/
 
 # Logs
 *.log
+
+# Tài liệu tham khảo cục bộ (PDF), không đưa lên repo
+MCM/

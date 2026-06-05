@@ -511,7 +511,7 @@ Hệ thống có hai lớp kiểm thử bổ trợ nhau.
 \paragraph{(a) Bộ testcase tường minh} nằm trong \texttt{testcases/}, gồm tệp dữ liệu \texttt{cases.json} và trình chấm \texttt{run\_testcases.py}. Dữ liệu chia hai nhóm:
 \begin{itemize}
   \item \emph{Nhóm hợp lệ} (12 ca): mỗi ca ghi mảng kích thước, chi phí kỳ vọng và dấu ngoặc kỳ vọng. Bốn ca đầu lấy từ ví dụ trong tài liệu và CLRS; tám ca còn lại thiết kế để phủ nhiều dạng cấu trúc: chuỗi hai ma trận (chỉ một cách nhân), trường hợp thứ tự ngoặc đổi chi phí gấp mười lần, kích thước tăng dần, giảm dần, bằng nhau, dao động mạnh, và hỗn hợp không quy luật.
-  \item \emph{Nhóm sai} (5 ca): phủ hai nhánh kiểm tra dữ liệu - mảng quá ngắn và phần tử không phải số nguyên dương (bao gồm phần tử = 0, phần tử âm, và số thực) - và đối chiếu thông điệp lỗi trùng khớp từng ký tự.
+  \item \emph{Nhóm sai} (4 ca): phủ hai nhánh kiểm tra dữ liệu - mảng quá ngắn và phần tử không phải số nguyên dương (bao gồm phần tử = 0, phần tử âm, và số thực) - và đối chiếu thông điệp lỗi trùng khớp từng ký tự.
 \end{itemize}
 
 \paragraph{(b) Bộ kiểm thử tự động} nằm trong \texttt{tests/}, chạy bằng \texttt{pytest}. Gồm test ví dụ cụ thể, test thông điệp lỗi, và một số test \emph{dựa trên tính chất} (property-based). Vì yêu cầu chỉ dùng thư viện chuẩn nên thay cho thư viện sinh dữ liệu chuyên dụng, các test tính chất dùng \texttt{random.Random(seed)} với seed cố định, mỗi test sinh từ 150 đến 200 mẫu ngẫu nhiên và có thể tái lập nhờ seed.
@@ -529,7 +529,7 @@ Hệ thống có hai lớp kiểm thử bổ trợ nhau.
 
 \subsection{Quy mô thử nghiệm}
 \begin{itemize}
-  \item Bộ testcase tường minh: 17 ca (12 hợp lệ + 5 sai).
+  \item Bộ testcase tường minh: 16 ca (12 hợp lệ + 4 sai).
   \item Bộ pytest: 42 test. Trong đó các test tính chất sinh ngẫu nhiên cộng dồn khoảng 1000 mẫu. Riêng test đối chiếu liệt kê toàn bộ chạy với $n \le 6$ (mỗi mẫu so tới $C_5 = 42$ cách đặt ngoặc).
   \item Ba lời giải được kiểm tra cho ra cùng kết quả trên mọi ví dụ bắt buộc.
 \end{itemize}
@@ -539,7 +539,7 @@ Hệ thống có hai lớp kiểm thử bổ trợ nhau.
 % =========================================================
 
 \subsection{Kết quả kiểm thử}
-Toàn bộ 42 test pytest đều PASS (đo trên Python 3.13, khoảng $0{,}2$ giây). Bộ testcase tường minh đạt $17/17$ PASS. Kết quả dòng lệnh trùng khớp với bảng tham chiếu trong tài liệu.
+Toàn bộ 42 test pytest đều PASS (đo trên Python 3.13, khoảng $0{,}2$ giây). Bộ testcase tường minh đạt $16/16$ PASS. Kết quả dòng lệnh trùng khớp với bảng tham chiếu trong tài liệu.
 
 \subsection{Đầu ra mẫu của CLI}
 Lệnh \texttt{python -m mcm2 30 35 15 5 10 20 25} cho:
@@ -697,7 +697,7 @@ Bộ kiểm thử xác nhận cả ba cho cùng chi phí trên mọi ví dụ, v
   \item Ô số hàng của mọi ma trận (trừ ma trận đầu) bị khoá và tô đỏ, tự lấy bằng số cột của ma trận liền trước -- đảm bảo ràng buộc ``cột trước = hàng sau'' và không thể nhập chuỗi không hợp lệ.
   \item Xem trước hiển thị song song chuỗi ma trận (ví dụ \texttt{A1(30$\times$35) $\cdot$ A2(35$\times$15) $\cdots$}) và mảng $p$ tương ứng.
   \item Khối giải thích thu gọn (bấm để mở) trình bày quy tắc $A_i = p[i{-}1] \times p[i]$ kèm sơ đồ minh hoạ mỗi ma trận trải dưới hai mốc liền kề.
-  \item Mục \emph{Ví dụ nhanh} (thu gọn, bấm để mở) liệt kê toàn bộ 17 testcase chia hai nhóm rõ ràng: 12 ca input hợp lệ (V01--V12) và 5 ca input không hợp lệ (E01--E05). Nhóm lỗi tô màu đỏ để phân biệt; bấm vào bất kỳ ca lỗi nào sẽ điền dữ liệu vào ô nhập và hiển thị thông báo lỗi xác thực tương ứng.
+  \item Mục \emph{Ví dụ nhanh} (thu gọn, bấm để mở) liệt kê toàn bộ 16 testcase chia hai nhóm rõ ràng: 12 ca input hợp lệ (V01--V12) và 4 ca input không hợp lệ (E01--E04). Nhóm lỗi tô màu đỏ để phân biệt; bấm vào bất kỳ ca lỗi nào sẽ điền dữ liệu vào ô nhập và hiển thị thông báo lỗi xác thực tương ứng.
 \end{itemize}
 
 \subsection{Triển khai trực tuyến}
@@ -724,7 +724,7 @@ Tóm lại, AI tiện để giải nhanh ví dụ phổ biến, nhưng với yê
 % =========================================================
 
 \subsection{Kết quả đạt được}
-Báo cáo trình bày trọn vẹn quá trình giải bài toán Matrix Chain Multiplication: từ trực giác \enquote{thứ tự nhân quyết định chi phí}, cấu trúc con tối ưu, công thức truy hồi, mã giả, đến cài đặt Python. Hệ thống có ba lời giải (đệ quy thuần, đệ quy ghi nhớ, lấp bảng từ dưới lên) đối chiếu lẫn nhau, một bộ testcase tường minh 17 ca, một bộ pytest 42 test, một giao diện dòng lệnh và một giao diện web minh hoạ từng bước.
+Báo cáo trình bày trọn vẹn quá trình giải bài toán Matrix Chain Multiplication: từ trực giác \enquote{thứ tự nhân quyết định chi phí}, cấu trúc con tối ưu, công thức truy hồi, mã giả, đến cài đặt Python. Hệ thống có ba lời giải (đệ quy thuần, đệ quy ghi nhớ, lấp bảng từ dưới lên) đối chiếu lẫn nhau, một bộ testcase tường minh 16 ca, một bộ pytest 42 test, một giao diện dòng lệnh và một giao diện web minh hoạ từng bước.
 
 \subsection{Hạn chế}
 \begin{itemize}

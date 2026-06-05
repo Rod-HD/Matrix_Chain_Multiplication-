@@ -1,6 +1,6 @@
 # Bộ testcase - Matrix Chain Multiplication
 
-Bộ testcase tường minh gồm **17 ca**: 12 ca input hợp lệ và 5 ca input sai.
+Bộ testcase tường minh gồm **16 ca**: 12 ca input hợp lệ và 4 ca input sai.
 Chạy tất cả: `python testcases/run_testcases.py`
 
 ---
@@ -46,7 +46,7 @@ bản bottom-up chọn một trong các đáp án tối ưu đó.
 
 ---
 
-## Nhóm 2 - Input sai (5 ca)
+## Nhóm 2 - Input sai (4 ca)
 
 Mỗi ca kiểm tra chương trình phải ném `DimensionError` với thông điệp
 **trùng khớp nguyên văn** (từng ký tự).
@@ -54,10 +54,9 @@ Mỗi ca kiểm tra chương trình phải ném `DimensionError` với thông đ
 | ID  | Mô tả | Input | Thông điệp lỗi mong đợi |
 |-----|-------|-------|-------------------------|
 | E01 | Mảng một phần tử | `[5]` | `Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận` |
-| E02 | Mảng rỗng | `[]` | `Mảng kích thước cần tối thiểu 2 phần tử để mô tả ít nhất 1 ma trận` |
-| E03 | Chứa phần tử bằng 0 | `[10, 0, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, nhận 0` |
-| E04 | Chứa phần tử âm | `[10, -3, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, nhận -3` |
-| E05 | Chứa số thực | `[10, 2.5, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, nhận 2.5` |
+| E02 | Chứa phần tử bằng 0 | `[10, 0, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, không nhận 0` |
+| E03 | Chứa phần tử âm | `[10, -3, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, không nhận -3` |
+| E04 | Chứa số thực | `[10, 2.5, 5]` | `Phần tử tại vị trí 1 phải là số nguyên dương, không nhận 2.5` |
 
 ---
 

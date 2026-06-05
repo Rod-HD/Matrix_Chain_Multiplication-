@@ -48,12 +48,11 @@ def validate_dimensions(dims: Sequence[object]) -> int:
     # 2+3) Mọi phần tử phải là số nguyên dương. Kiểm tra theo thứ tự:
     #   - kiểu: loại float, str, bool (bool là subclass của int nên cần kiểm tra riêng)
     #   - dấu: loại <= 0
-    # Cả hai dạng sai đều thông báo "phải là số nguyên dương" vì
-    # người dùng chỉ cần biết giá trị đó không hợp lệ làm kích thước ma trận.
+    # Cả hai dạng sai đều thông báo "phải là số nguyên dương" để rõ ràng.
     for index, value in enumerate(dims):
         if type(value) is not int or value <= 0:
             raise DimensionError(
-                f"Phần tử tại vị trí {index} phải là số nguyên dương, nhận {value!r}"
+                f"Phần tử tại vị trí {index} phải là số nguyên dương, không nhận {value!r}"
             )
 
     return len(dims) - 1

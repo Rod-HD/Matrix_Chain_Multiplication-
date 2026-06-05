@@ -67,10 +67,15 @@
 \lstset{style=py}
 
 % fancyvrb: dùng cho các khối output chứa tiếng Việt (lstlisting không hỗ trợ
-% Unicode qua fontspec; fancyvrb kế thừa font hiện tại nên render đúng).
+% Unicode qua fontspec). Verbatim mặc định dùng font mono Latin Modern KHÔNG có
+% glyph tiếng Việt -> chữ có dấu bị render thành "?". Vì vậy khai báo riêng một
+% font mono có hỗ trợ tiếng Việt (DejaVu Sans Mono, sẵn trên TeX Live/Overleaf)
+% và áp cho môi trường VOutput qua formatcom.
 \usepackage{fancyvrb}
+\newfontfamily\monovn{DejaVu Sans Mono}[Scale=0.85]
 \DefineVerbatimEnvironment{VOutput}{Verbatim}{%
   fontsize=\footnotesize,
+  formatcom=\monovn,
   frame=single,
   rulecolor=\color{codeborder},
   fillcolor=\color{codebg},

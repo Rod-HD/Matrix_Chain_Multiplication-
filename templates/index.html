@@ -83,13 +83,31 @@
         <button id="solve-btn">Giải</button>
       </div>
 
-      <div class="examples">
-        Ví dụ nhanh:
-        <button class="example" data-dims="3 10 7 2">3 ma trận</button>
-        <button class="example" data-dims="10 20 50 1 100">4 ma trận</button>
-        <button class="example" data-dims="30 35 15 5 10 20 25">6 ma trận (Cormen)</button>
-        <button class="example" data-dims="100 1 100 1 100">dao động</button>
-      </div>
+      <details class="examples-panel">
+        <summary>Ví dụ nhanh</summary>
+        <div class="examples-grid">
+          <span class="eg-group">Nhóm 1 &mdash; Input hợp lệ (V01&ndash;V12)</span>
+          <button class="example" data-dims="3 10 7 2">V01 &mdash; [3,10,7,2] &rarr; 200</button>
+          <button class="example" data-dims="10 20 50 1 100">V02 &mdash; [10,20,50,1,100] &rarr; 2200</button>
+          <button class="example" data-dims="30 35 15 5 10 20 25">V03 &mdash; [30,35,15,5,10,20,25] &rarr; 15125</button>
+          <button class="example" data-dims="5 7">V04 &mdash; [5,7] &rarr; 0 (n=1)</button>
+          <button class="example" data-dims="10 30 5">V05 &mdash; [10,30,5] &rarr; 1500</button>
+          <button class="example" data-dims="10 100 5 50">V06 &mdash; [10,100,5,50] &rarr; 7500</button>
+          <button class="example" data-dims="1 2 3 4 5">V07 &mdash; [1,2,3,4,5] &rarr; 38</button>
+          <button class="example" data-dims="5 4 3 2 1">V08 &mdash; [5,4,3,2,1] &rarr; 38</button>
+          <button class="example" data-dims="2 2 2 2 2">V09 &mdash; [2,2,2,2,2] &rarr; 24</button>
+          <button class="example" data-dims="100 1 100 1 100">V10 &mdash; [100,1,100,1,100] &rarr; 10200</button>
+          <button class="example" data-dims="4 10 3 12 20 7 5 8">V11 &mdash; [4,10,3,12,20,7,5,8] &rarr; 1581</button>
+          <button class="example" data-dims="13 5 89 3 34">V12 &mdash; [13,5,89,3,34] &rarr; 2856</button>
+
+          <span class="eg-group">Nhóm 2 &mdash; Input không hợp lệ (E01&ndash;E05)</span>
+          <button class="example example-err" data-dims="5">E01 &mdash; [5] &rarr; mảng 1 phần tử</button>
+          <button class="example example-err" data-dims="">E02 &mdash; [] &rarr; mảng rỗng</button>
+          <button class="example example-err" data-dims="10 0 5">E03 &mdash; [10,0,5] &rarr; phần tử = 0</button>
+          <button class="example example-err" data-dims="10 -3 5">E04 &mdash; [10,-3,5] &rarr; phần tử âm</button>
+          <button class="example example-err" data-dims="10 2.5 5">E05 &mdash; [10,2.5,5] &rarr; số thực</button>
+        </div>
+      </details>
       <p id="error" class="error hidden"></p>
     </section>
 

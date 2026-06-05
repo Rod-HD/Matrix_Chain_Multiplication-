@@ -228,8 +228,44 @@ button:hover { border-color: var(--accent); }
 
 #solve-btn { background: var(--accent); color: #04263a; font-weight: 600; border: none; }
 
-.examples { margin-top: 12px; color: var(--muted); font-size: 0.9rem; }
-.examples .example { padding: 4px 10px; margin: 4px 4px 0 0; font-size: 0.85rem; }
+.examples-panel {
+  margin: 10px 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  padding: 8px 12px;
+}
+.examples-panel > summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.92rem;
+  font-weight: 600;
+  list-style: none;
+}
+.examples-panel > summary::-webkit-details-marker { display: none; }
+.examples-panel > summary::before {
+  content: "\25B6";
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 0.7rem;
+  transition: transform 0.15s;
+}
+.examples-panel[open] > summary::before { transform: rotate(90deg); }
+.examples-panel[open] > summary { margin-bottom: 10px; }
+.examples-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.examples-grid .example { text-align: left; padding: 6px 12px; font-size: 0.88rem; }
+.examples-grid .example-err { border-color: #f87171; color: #fca5a5; }
+.examples-grid .example-err:hover { border-color: #ef4444; background: #2a1416; }
+.eg-group {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 6px;
+  font-weight: 600;
+}
 
 .error {
   margin-top: 12px;

@@ -693,10 +693,11 @@ Bộ kiểm thử xác nhận cả ba cho cùng chi phí trên mọi ví dụ, v
 \subsection{Giao diện nhập liệu trực quan}
 Điểm khó với người mới là hiểu mảng $p$: nó không phải kích thước của từng ma trận mà là \emph{chuỗi mốc kích thước nối tiếp} -- con số ở giữa vừa là số cột của ma trận trước vừa là số hàng của ma trận sau. Giao diện web giải quyết bằng \emph{bộ dựng theo từng ma trận}:
 \begin{itemize}
-  \item Mỗi ma trận hiển thị dưới dạng \texttt{Ai: [hàng] $\times$ [cột]}; thêm/bớt bằng nút $+$/$-$.
+  \item Mỗi ma trận hiển thị dưới dạng \texttt{Ai: [hàng] $\times$ [cột]}; thêm/bớt bằng nút $+$/$-$ hoặc gõ số trực tiếp vào ô đếm rồi Enter.
   \item Ô số hàng của mọi ma trận (trừ ma trận đầu) bị khoá và tô đỏ, tự lấy bằng số cột của ma trận liền trước -- đảm bảo ràng buộc ``cột trước = hàng sau'' và không thể nhập chuỗi không hợp lệ.
   \item Xem trước hiển thị song song chuỗi ma trận (ví dụ \texttt{A1(30$\times$35) $\cdot$ A2(35$\times$15) $\cdots$}) và mảng $p$ tương ứng.
   \item Khối giải thích thu gọn (bấm để mở) trình bày quy tắc $A_i = p[i{-}1] \times p[i]$ kèm sơ đồ minh hoạ mỗi ma trận trải dưới hai mốc liền kề.
+  \item Mục \emph{Ví dụ nhanh} (thu gọn, bấm để mở) liệt kê toàn bộ 17 testcase chia hai nhóm rõ ràng: 12 ca input hợp lệ (V01--V12) và 5 ca input không hợp lệ (E01--E05). Nhóm lỗi tô màu đỏ để phân biệt; bấm vào bất kỳ ca lỗi nào sẽ điền dữ liệu vào ô nhập và hiển thị thông báo lỗi xác thực tương ứng.
 \end{itemize}
 
 \subsection{Triển khai trực tuyến}

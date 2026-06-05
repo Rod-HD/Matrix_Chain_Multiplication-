@@ -35,7 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.querySelectorAll(".example").forEach((btn) => {
     btn.addEventListener("click", () => {
-      loadDims(btn.dataset.dims.split(/[\s,]+/).map(Number));
+      const rawDims = btn.dataset.dims.trim();
+      if (btn.classList.contains("example-err")) {
+        // Nạp trực tiếp vào ô nhập để hiển thị thông báo lỗi xác thực
+        $("dims").value = rawDims;
+        applyRawDims();
+        return;
+      }
+      loadDims(rawDims.split(/[\s,]+/).map(Number));
       solve();
     });
   });
@@ -176,7 +183,6 @@ function renderBuilder() {
     });
   });
 
-  $("matrix-count").textContent = `${matrices.length} ma trận`;
   $("matrix-count-input").value = matrices.length;
   $("rm-matrix").disabled = matrices.length <= 1;
 
@@ -290,7 +296,7 @@ function renderStep() {
   const s = steps[stepIndex];
   $("step-counter").textContent = `Bước ${stepIndex + 1}/${steps.length}`;
 
-  let html = `<div class="step-title">Tính đoạn A${s.i}..A${s.j} (độ dài ${s.length})</div>`;
+  let html = `<div class="step-title">Tính đoạn ${rangeLabel(s.i, s.j)} (độ dài ${s.length})</div>`;
   s.candidates.forEach((c) => {
     const best = c.k === s.best_k ? " best" : "";
     html += `<div class="candidate${best}">k = ${c.k}: ${c.formula}</div>`;
@@ -311,6 +317,13 @@ function moveStep(delta) {
 }
 
 // ─── SVG Tree + Trace ────────────────────────────────────────────────────────
+
+// Compact range label: A1 if i==j, A1A2 if adjacent, else A1..Aj
+function rangeLabel(i, j) {
+  if (i === j) return `A${i}`;
+  if (j === i + 1) return `A${i}A${j}`;
+  return `A${i}..A${j}`;
+}
 
 function renderTree() {
   if (!current) return;
@@ -412,7 +425,7 @@ function renderTree() {
       t2.setAttribute("font-family", "Consolas, monospace");
       t2.setAttribute("font-size", "10");
       t2.setAttribute("fill", INNER_FG);
-      t2.textContent = `A${node.i}..A${node.j}`;
+      t2.textContent = rangeLabel(node.i, node.j);
       svg.appendChild(t2);
     }
 
@@ -431,9 +444,9 @@ function renderTree() {
     }
     const lines = [];
     lines.push(`${pad}<span class="trace-split">split(${node.i},${node.j}) tại k=${node.k}:</span>`);
-    lines.push(`${pad}  Trái: A${node.i}..A${node.k}`);
+    lines.push(`${pad}  Trái: ${rangeLabel(node.i, node.k)}`);
     lines.push(...traceLines(node.left, indent + 2));
-    lines.push(`${pad}  Phải: A${node.k + 1}..A${node.j}`);
+    lines.push(`${pad}  Phải: ${rangeLabel(node.k + 1, node.j)}`);
     lines.push(...traceLines(node.right, indent + 2));
     return lines;
   }
